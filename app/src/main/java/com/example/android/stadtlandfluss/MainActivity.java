@@ -125,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
             difficulty = 3;
         }
 
-        //todo: check for correct answers, each correct answer adds 1 point --
+        //todo: check for correct answers, each correct answer adds 1 point 
 
         //calculate score
         score = timeScore() * difficulty;
