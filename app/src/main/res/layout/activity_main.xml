@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.example.android.stadtlandfluss.MainActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/Base.TextAppearance.AppCompat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/select_fields" />
+
+            <CheckBox
+                android:id="@+id/play_checkbox_city"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/checkbox_city" />
+
+            <CheckBox
+                android:id="@+id/play_checkbox_country"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/checkbox_country" />
+
+            <CheckBox
+                android:id="@+id/play_checkbox_river"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/checkbox_river" />
+
+            <CheckBox
+                android:id="@+id/play_checkbox_mountain"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/checkbox_mountain" />
+
+            <TextView
+                style="@style/Base.TextAppearance.AppCompat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="@string/select_difficulty" />
+
+            <RadioGroup
+                android:id="@+id/radio_group_select_difficulty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checkedButton="@+id/radiobutton_easy">
+
+                <RadioButton
+                    android:id="@+id/radiobutton_easy"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/select_difficulty_easy" />
+
+                <RadioButton
+                    android:id="@+id/radiobutton_middle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/select_difficulty_middle" />
+
+                <RadioButton
+                    android:id="@+id/radiobutton_hard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/select_difficulty_hard"
+                    android:layout_marginBottom="24dp"/>
+            </RadioGroup>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_weight="0.2">
+
+                    <Button
+                        android:id="@+id/start_button"
+                        style="@style/button"
+                        android:onClick="startGame"
+                        android:text="@string/start_button" />
+
+                    <Button
+                        android:id="@+id/stop_button"
+                        style="@style/button"
+                        android:onClick="stopGame"
+                        android:text="@string/stop_button" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/letter_to_play"
+                    style="@style/highlightedText"
+                    android:text="@string/letter_to_play" />
+
+                <Chronometer
+                    android:id="@+id/chronometer"
+                    style="@style/highlightedText"
+                    android:text="00:00"/>
+            </LinearLayout>
+
+
+            <HorizontalScrollView
+                android:id="@+id/horizontalView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:scrollbars="horizontal|vertical">
+
+                <TableLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:stretchColumns="0,1,2,3"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true">
+
+                    <TableRow
+                        android:id="@+id/table_row_head"
+                        style="@style/tableRow">
+
+                        <TextView
+                            android:id="@+id/table_head_city"
+                            style="@style/headRow"
+                            android:text="@string/checkbox_city" />
+
+                        <TextView
+                            android:id="@+id/table_head_country"
+                            style="@style/headRow"
+                            android:text="@string/checkbox_country" />
+
+                        <TextView
+                            android:id="@+id/table_head_river"
+                            style="@style/headRow"
+                            android:text="@string/checkbox_river" />
+
+                        <TextView
+                            android:id="@+id/table_head_mountain"
+                            style="@style/headRow"
+                            android:text="@string/checkbox_mountain" />
+                    </TableRow>
+
+                    <TableRow
+                        android:id="@+id/tableRow1"
+                        style="@style/tableRow">
+
+                        <EditText
+                            android:id="@+id/edit_text_city"
+                            style="@style/editTextRow">
+                        </EditText>
+
+                        <EditText
+                            android:id="@+id/edit_text_country"
+                            style="@style/editTextRow">
+                        </EditText>
+
+                        <EditText
+                            android:id="@+id/edit_text_river"
+                            style="@style/editTextRow">
+                        </EditText>
+
+                        <EditText
+                            android:id="@+id/edit_text_mountain"
+                            style="@style/editTextRow">
+                        </EditText>
+                    </TableRow>
+                </TableLayout>
+            </HorizontalScrollView>
+
+            <TextView
+                android:id="@+id/your_score_is"
+                style="@style/highlightedText"
+                android:text="" />
+
+        </LinearLayout>
+    </ScrollView>
+</RelativeLayout>
