@@ -22,14 +22,19 @@ public class MainActivity extends AppCompatActivity {
     private KeyListener editTextRiverKeyListener;
     private KeyListener editTextMountainKeyListener;
 
-    //todo: arrange table in blocks above each other
+    //todo: keep status when switching to landscape
+    //todo: arrange table in blocks above each other / center fields!?
     //todo: data base!!!! getText from editText
     //todo: adjust difficulty according to database entries
+    //todo: add game icon and background icon b/W
+    //todo: add navigation drawer for settings and home, see example code
+    //todo: educational - link to Wiki
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         //hide stop button
         Button stopButton = (Button) findViewById(R.id.stop_button);
         stopButton.setVisibility(View.GONE);
@@ -42,7 +47,11 @@ public class MainActivity extends AppCompatActivity {
         editTextRiverKeyListener = editTextRiver.getKeyListener();
         EditText editTextMountain = (EditText) findViewById(R.id.edit_text_mountain);
         editTextMountainKeyListener = editTextMountain.getKeyListener();
+        //hide bar that shows score
+        TextView scoreBar = (TextView) findViewById(R.id.your_score_is);
+        scoreBar.setVisibility(View.GONE);
     }
+
 
     //Start button: selected letter and stop button are displayed, stop watch is reset, text entry in table is enabled
     public void startGame(View view) {
@@ -93,7 +102,9 @@ public class MainActivity extends AppCompatActivity {
         editTextRiver.setKeyListener(null);
         EditText editTextMountain = (EditText) findViewById(R.id.edit_text_mountain);
         editTextMountain.setKeyListener(null);
-        //calculate and display score
+        //calculate and display score, unhide score bar
+        TextView scoreBar = (TextView) findViewById(R.id.your_score_is);
+        scoreBar.setVisibility(View.VISIBLE);
         calculateScore();
     }
 
@@ -125,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
             difficulty = 3;
         }
 
-        //todo: check for correct answers, each correct answer adds 1 point 
+        //todo: check for correct answers, each correct answer adds 1 point
 
         //calculate score
         score = timeScore() * difficulty;
