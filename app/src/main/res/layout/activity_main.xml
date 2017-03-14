@@ -1,24 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
+    android:fitsSystemWindows="true"
     tools:context="com.example.android.stadtlandfluss.MainActivity">
 
-    <ScrollView
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Load the toolbar -->
+        <include
+            layout="@layout/toolbar_main"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/activity_vertical_margin"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingTop="@dimen/activity_vertical_margin">
 
             <TextView
                 style="@style/Base.TextAppearance.AppCompat"
@@ -28,30 +41,22 @@
 
             <CheckBox
                 android:id="@+id/play_checkbox_city"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
+                style="@style/checkBox"
                 android:text="@string/checkbox_city" />
 
             <CheckBox
                 android:id="@+id/play_checkbox_country"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
+                style="@style/checkBox"
                 android:text="@string/checkbox_country" />
 
             <CheckBox
                 android:id="@+id/play_checkbox_river"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
+                style="@style/checkBox"
                 android:text="@string/checkbox_river" />
 
             <CheckBox
                 android:id="@+id/play_checkbox_mountain"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
+                style="@style/checkBox"
                 android:text="@string/checkbox_mountain" />
 
             <TextView
@@ -69,20 +74,17 @@
 
                 <RadioButton
                     android:id="@+id/radiobutton_easy"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    style="@style/checkBox"
                     android:text="@string/select_difficulty_easy" />
 
                 <RadioButton
                     android:id="@+id/radiobutton_middle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    style="@style/checkBox"
                     android:text="@string/select_difficulty_middle" />
 
                 <RadioButton
                     android:id="@+id/radiobutton_hard"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    style="@style/checkBox"
                     android:text="@string/select_difficulty_hard"
                     android:layout_marginBottom="24dp"/>
             </RadioGroup>
@@ -91,12 +93,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_weight="0.2">
 
                     <Button
                         android:id="@+id/start_button"
@@ -120,7 +116,7 @@
                     android:id="@+id/chronometer"
                     style="@style/highlightedText"
                     android:text="00:00"/>
-            </LinearLayout>
+
 
 
             <HorizontalScrollView
@@ -132,7 +128,8 @@
                 <TableLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="8dp"
                     android:stretchColumns="0,1,2,3"
                     android:focusable="true"
                     android:focusableInTouchMode="true">
@@ -192,8 +189,10 @@
             <TextView
                 android:id="@+id/your_score_is"
                 style="@style/highlightedText"
+                android:padding="8dp"
                 android:text="" />
 
         </LinearLayout>
     </ScrollView>
+    </LinearLayout>
 </RelativeLayout>

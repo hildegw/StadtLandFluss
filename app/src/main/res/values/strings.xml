@@ -16,7 +16,7 @@
     <string name="play_header_country">Country</string>
     <string name="play_header_river">River</string>
     <string name="show_score">Stop and Show Score</string>
-    <string name="your_score_is">Your Score is</string>
+    <string name="your_score_is">You scored</string>
     <string name="start_game">Plaese press START</string>
     <string name="easy_letters">ADEFMNRST</string>
     <string name="middle_letters">BCGHJKLPU</string>

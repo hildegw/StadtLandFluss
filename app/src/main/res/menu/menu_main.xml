@@ -1,0 +1,15 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/table"
+        android:icon="@drawable/ic_terrain_black_24dp"
+        app:showAsAction="ifRoom"
+        android:title="Table">
+    </item>
+    <item
+        android:id="@+id/difficulty"
+        android:icon="@drawable/ic_font_download_black_24dp"
+        app:showAsAction="ifRoom"
+        android:title="Difficulty">
+    </item>
+</menu>
