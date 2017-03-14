@@ -1,9 +1,13 @@
 package com.example.android.stadtlandfluss;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.method.KeyListener;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -21,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private KeyListener editTextCountryKeyListener;
     private KeyListener editTextRiverKeyListener;
     private KeyListener editTextMountainKeyListener;
+    private Toolbar myToolbar;
 
     //todo: keep status when switching to landscape
     //todo: arrange table in blocks above each other / center fields!?
@@ -29,12 +34,15 @@ public class MainActivity extends AppCompatActivity {
     //todo: add game icon and background icon b/W
     //todo: add navigation drawer for settings and home, see example code
     //todo: educational - link to Wiki
+    //todo: colors.xml
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        //Set Toolbar (see menu file)
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        setSupportActionBar(myToolbar);
         //hide stop button
         Button stopButton = (Button) findViewById(R.id.stop_button);
         stopButton.setVisibility(View.GONE);
@@ -50,6 +58,35 @@ public class MainActivity extends AppCompatActivity {
         //hide bar that shows score
         TextView scoreBar = (TextView) findViewById(R.id.your_score_is);
         scoreBar.setVisibility(View.GONE);
+    }
+
+    //Todo Toolbar: https://guides.codepath.com/android/Using-the-App-Toolbar
+    // Menu icons in toolbar are inflated just as with actionbar
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    //Handle Toolbar Icon click events
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle presses on the action bar items
+        switch (item.getItemId()) {
+            case R.id.table:
+                //Start second activity: table
+                Intent intentTable = new Intent(MainActivity.this, TableActivity.class);
+                startActivity(intentTable);
+                return true;
+            case R.id.difficulty:
+                //Start third activity: difficulty
+                Intent intentDifficulty = new Intent(MainActivity.this, DifficultyActivity.class);
+                startActivity(intentDifficulty);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
 
@@ -124,7 +161,6 @@ public class MainActivity extends AppCompatActivity {
     private void calculateScore() {
         int score = 0;
         int difficulty = 0;
-
         //check, which difficulty is selected (radio button) and multiply with score (1, 2, 3)
         RadioGroup selectDifficultyRadioGroup = (RadioGroup) findViewById(R.id.radio_group_select_difficulty);
         int checkedId = selectDifficultyRadioGroup.getCheckedRadioButtonId();
@@ -137,10 +173,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //todo: check for correct answers, each correct answer adds 1 point
-
         //calculate score
         score = timeScore() * difficulty;
-
         //display score
         String showScore = String.valueOf(score);
         TextView selectedLetterText = (TextView) findViewById(R.id.your_score_is);
