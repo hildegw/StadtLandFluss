@@ -33,7 +33,7 @@ public class DifficultyActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle presses on the action bar items
         switch (item.getItemId()) {
-            case R.id.table:
+            case R.id.goback:
                 //Go back to main activity
                 Intent intent = new Intent(DifficultyActivity.this, MainActivity.class);
                 startActivity(intent);

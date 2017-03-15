@@ -10,7 +10,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.Chronometer;
 import android.widget.EditText;
 import android.widget.RadioGroup;
@@ -40,12 +39,17 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //Set Toolbar (see menu file)
+        //Set Toolbar (see menu file) - https://guides.codepath.com/android/Using-the-App-Toolbar
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
         //hide stop button
         Button stopButton = (Button) findViewById(R.id.stop_button);
         stopButton.setVisibility(View.GONE);
+        //Setup table to play with selected settings from fields activity - if available
+        setupTableToPlay();
+        //todo: provide Letter to play according to selection in difficulty activity - if available
+
+
         //Fetch keyListener from EditText fields in table
         EditText editTextCity = (EditText) findViewById(R.id.edit_text_city);
         editTextCityKeyListener = editTextCity.getKeyListener();
@@ -60,7 +64,6 @@ public class MainActivity extends AppCompatActivity {
         scoreBar.setVisibility(View.GONE);
     }
 
-    //Todo Toolbar: https://guides.codepath.com/android/Using-the-App-Toolbar
     // Menu icons in toolbar are inflated just as with actionbar
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -93,7 +96,6 @@ public class MainActivity extends AppCompatActivity {
     //Start button: selected letter and stop button are displayed, stop watch is reset, text entry in table is enabled
     public void startGame(View view) {
         selectLetter();
-        setupTableToPlay();
         //reset & start stop watch
         chronometer = (Chronometer) findViewById(R.id.chronometer);
         chronometer.stop();
@@ -205,12 +207,30 @@ public class MainActivity extends AppCompatActivity {
 
     //Provide fields to play in table based on boxes checked
     private void setupTableToPlay() {
+        //get selections from fields activity (true/false via Extras(Bundle))
+        boolean citySelected = true;
+        boolean countrySelected = true;
+        boolean riverSelected = true;
+        boolean mountainSelected = true;
+        Bundle fields  = getIntent().getExtras();
+        if(fields != null) {
+            citySelected = fields.getBoolean("City");
+            countrySelected = fields.getBoolean("Country");
+            riverSelected = fields.getBoolean("River");
+            mountainSelected = fields.getBoolean("Mountain");
+            //todo delete log
+            //String forLog = fields.get("Mountain").toString();
+            //Log.i("country", forLog);
+        } else {
+            citySelected = true;
+            countrySelected = true;
+            riverSelected = true;
+            mountainSelected = true;
+        }
         //Each field to play (column) is made visible/gone depending on checkbox, here: "city"
-        CheckBox cityCheckBox = (CheckBox) findViewById(R.id.play_checkbox_city);
-        boolean citySelected = cityCheckBox.isChecked();
         TextView cityTableHead = (TextView) findViewById(R.id.table_head_city);
         TextView cityTableField = (TextView) findViewById(R.id.edit_text_city);
-        if (citySelected == true) {
+        if (citySelected) {
             cityTableHead.setText(R.string.checkbox_city);
             cityTableHead.setVisibility(View.VISIBLE);
             cityTableField.setVisibility(View.VISIBLE);
@@ -218,13 +238,10 @@ public class MainActivity extends AppCompatActivity {
             cityTableHead.setVisibility(View.GONE);
             cityTableField.setVisibility(View.GONE);
         }
-        
         //here: "country"
-        CheckBox countryCheckBox = (CheckBox) findViewById(R.id.play_checkbox_country);
-        boolean countrySelected = countryCheckBox.isChecked();
         TextView countryTableHead = (TextView) findViewById(R.id.table_head_country);
         TextView countryTableField = (TextView) findViewById(R.id.edit_text_country);
-        if (countrySelected == true) {
+        if (countrySelected) {
             countryTableHead.setText(R.string.checkbox_country);
             countryTableHead.setVisibility(View.VISIBLE);
             countryTableField.setVisibility(View.VISIBLE);
@@ -232,13 +249,10 @@ public class MainActivity extends AppCompatActivity {
             countryTableHead.setVisibility(View.GONE);
             countryTableField.setVisibility(View.GONE);
         }
-
         //here: "river"
-        CheckBox riverCheckBox = (CheckBox) findViewById(R.id.play_checkbox_river);
-        boolean riverSelected = riverCheckBox.isChecked();
         TextView riverTableHead = (TextView) findViewById(R.id.table_head_river);
         TextView riverTableField = (TextView) findViewById(R.id.edit_text_river);
-        if (riverSelected == true) {
+        if (riverSelected) {
             riverTableHead.setText(R.string.checkbox_river);
             riverTableHead.setVisibility(View.VISIBLE);
             riverTableField.setVisibility(View.VISIBLE);
@@ -246,13 +260,10 @@ public class MainActivity extends AppCompatActivity {
             riverTableHead.setVisibility(View.GONE);
             riverTableField.setVisibility(View.GONE);
         }
-
         //here: "mountain"
-        CheckBox mountainCheckBox = (CheckBox) findViewById(R.id.play_checkbox_mountain);
-        boolean mountainSelected = mountainCheckBox.isChecked();
         TextView mountainTableHead = (TextView) findViewById(R.id.table_head_mountain);
         TextView mountainTableField = (TextView) findViewById(R.id.edit_text_mountain);
-        if (mountainSelected == true) {
+        if (mountainSelected) {
             mountainTableHead.setText(R.string.checkbox_mountain);
             mountainTableHead.setVisibility(View.VISIBLE);
             mountainTableField.setVisibility(View.VISIBLE);

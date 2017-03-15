@@ -6,9 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.CheckBox;
-import android.widget.TextView;
+
 
 public class TableActivity extends AppCompatActivity {
 
@@ -35,9 +34,11 @@ public class TableActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle presses on the action bar items
         switch (item.getItemId()) {
-            case R.id.table:
-                //Go back to main activity
+            case R.id.goback:
+                //Go back to main activity and hand over checked boxes info
+                Bundle checkedBoxes = findBoxesChecked();
                 Intent intent = new Intent(TableActivity.this, MainActivity.class);
+                intent.putExtras(checkedBoxes);
                 startActivity(intent);
                 return true;
             default:
@@ -45,69 +46,22 @@ public class TableActivity extends AppCompatActivity {
         }
     }
 
-
-
-
-
-    //todo handover result to main acitivity
-    //Provide fields to play in table based on boxes checked
-    private void setupTableToPlay() {
-        //Each field to play (column) is made visible/gone depending on checkbox, here: "city"
+    //todo keep selection when switching activities
+    //Identify checked boxes and hand over to main acitivity
+    private Bundle findBoxesChecked() {
+        Bundle checkedBoxes = new Bundle();
         CheckBox cityCheckBox = (CheckBox) findViewById(R.id.play_checkbox_city);
         boolean citySelected = cityCheckBox.isChecked();
-        TextView cityTableHead = (TextView) findViewById(R.id.table_head_city);
-        TextView cityTableField = (TextView) findViewById(R.id.edit_text_city);
-        if (citySelected == true) {
-            cityTableHead.setText(R.string.checkbox_city);
-            cityTableHead.setVisibility(View.VISIBLE);
-            cityTableField.setVisibility(View.VISIBLE);
-        } else {
-            cityTableHead.setVisibility(View.GONE);
-            cityTableField.setVisibility(View.GONE);
-        }
-
-        //here: "country"
+        checkedBoxes.putBoolean("City", citySelected);
         CheckBox countryCheckBox = (CheckBox) findViewById(R.id.play_checkbox_country);
         boolean countrySelected = countryCheckBox.isChecked();
-        TextView countryTableHead = (TextView) findViewById(R.id.table_head_country);
-        TextView countryTableField = (TextView) findViewById(R.id.edit_text_country);
-        if (countrySelected == true) {
-            countryTableHead.setText(R.string.checkbox_country);
-            countryTableHead.setVisibility(View.VISIBLE);
-            countryTableField.setVisibility(View.VISIBLE);
-        } else {
-            countryTableHead.setVisibility(View.GONE);
-            countryTableField.setVisibility(View.GONE);
-        }
-
-        //here: "river"
+        checkedBoxes.putBoolean("Country", countrySelected);
         CheckBox riverCheckBox = (CheckBox) findViewById(R.id.play_checkbox_river);
         boolean riverSelected = riverCheckBox.isChecked();
-        TextView riverTableHead = (TextView) findViewById(R.id.table_head_river);
-        TextView riverTableField = (TextView) findViewById(R.id.edit_text_river);
-        if (riverSelected == true) {
-            riverTableHead.setText(R.string.checkbox_river);
-            riverTableHead.setVisibility(View.VISIBLE);
-            riverTableField.setVisibility(View.VISIBLE);
-        } else {
-            riverTableHead.setVisibility(View.GONE);
-            riverTableField.setVisibility(View.GONE);
-        }
-
-        //here: "mountain"
+        checkedBoxes.putBoolean("River", riverSelected);
         CheckBox mountainCheckBox = (CheckBox) findViewById(R.id.play_checkbox_mountain);
         boolean mountainSelected = mountainCheckBox.isChecked();
-        TextView mountainTableHead = (TextView) findViewById(R.id.table_head_mountain);
-        TextView mountainTableField = (TextView) findViewById(R.id.edit_text_mountain);
-        if (mountainSelected == true) {
-            mountainTableHead.setText(R.string.checkbox_mountain);
-            mountainTableHead.setVisibility(View.VISIBLE);
-            mountainTableField.setVisibility(View.VISIBLE);
-        } else {
-            mountainTableHead.setVisibility(View.GONE);
-            mountainTableField.setVisibility(View.GONE);
-        }
+        checkedBoxes.putBoolean("Mountain", mountainSelected);
+        return checkedBoxes;
     }
-
-
 }
