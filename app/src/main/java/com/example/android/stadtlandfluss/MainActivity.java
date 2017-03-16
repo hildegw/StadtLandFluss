@@ -35,9 +35,6 @@ public class MainActivity extends AppCompatActivity {
     //todo: add navigation drawer for settings and home, see example code
     //todo: educational - link to Wiki
     //todo: colors.xml
-    //todo: logging Bundle
-        //String forLog = fields.get("Mountain").toString();
-        //Log.i("country", forLog);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

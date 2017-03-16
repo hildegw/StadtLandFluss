@@ -51,27 +51,18 @@ public class DifficultyActivity extends AppCompatActivity {
     private Bundle selectLetter() {
         //get selected difficulty
         int difficulty = 1;
-        /*String selectedLetter = "A";
-        Random randomLetter = new Random();
-        String easyLetters = getString(R.string.easy_letters);
-        String middleLetters = getString(R.string.middle_letters);
-        String hardLetters = getString(R.string.hard_letters);*/
         //check, which difficulty is selected (radio button) and set difficulty accordingly
         RadioGroup selectDifficultyRadioGroup = (RadioGroup) findViewById(R.id.radio_group_select_difficulty);
         int checkedId = selectDifficultyRadioGroup.getCheckedRadioButtonId();
         if (checkedId == R.id.radiobutton_easy) {
-            //selectedLetter = String.valueOf(easyLetters.charAt(randomLetter.nextInt(easyLetters.length())));
             difficulty = 1;
         } else if (checkedId == R.id.radiobutton_middle) {
-            //selectedLetter = String.valueOf(middleLetters.charAt(randomLetter.nextInt(middleLetters.length())));
             difficulty = 2;
         } else {
-            //selectedLetter = String.valueOf(hardLetters.charAt(randomLetter.nextInt(hardLetters.length())));
             difficulty = 3;
         }
         //Put Letter and Difficulty into Bundle for hand over to main activity
         Bundle letterBundle = new Bundle();
-        //letterBundle.putString("Letter", selectedLetter);
         letterBundle.putInt("Difficulty", difficulty);
         return letterBundle;
     }
