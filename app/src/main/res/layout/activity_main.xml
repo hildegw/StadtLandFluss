@@ -33,36 +33,6 @@
             android:paddingRight="@dimen/activity_horizontal_margin"
             android:paddingTop="@dimen/activity_vertical_margin">
 
-            <TextView
-                style="@style/Base.TextAppearance.AppCompat"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="@string/select_difficulty" />
-
-            <RadioGroup
-                android:id="@+id/radio_group_select_difficulty"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checkedButton="@+id/radiobutton_easy">
-
-                <RadioButton
-                    android:id="@+id/radiobutton_easy"
-                    style="@style/checkBox"
-                    android:text="@string/select_difficulty_easy" />
-
-                <RadioButton
-                    android:id="@+id/radiobutton_middle"
-                    style="@style/checkBox"
-                    android:text="@string/select_difficulty_middle" />
-
-                <RadioButton
-                    android:id="@+id/radiobutton_hard"
-                    style="@style/checkBox"
-                    android:text="@string/select_difficulty_hard"
-                    android:layout_marginBottom="24dp"/>
-            </RadioGroup>
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -12,10 +12,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.EditText;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import java.util.Random;
+
+import static com.example.android.stadtlandfluss.R.id.difficulty;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,6 +35,9 @@ public class MainActivity extends AppCompatActivity {
     //todo: add navigation drawer for settings and home, see example code
     //todo: educational - link to Wiki
     //todo: colors.xml
+    //todo: logging Bundle
+        //String forLog = fields.get("Mountain").toString();
+        //Log.i("country", forLog);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,11 +49,8 @@ public class MainActivity extends AppCompatActivity {
         //hide stop button
         Button stopButton = (Button) findViewById(R.id.stop_button);
         stopButton.setVisibility(View.GONE);
-        //Setup table to play with selected settings from fields activity - if available
+        //Setup table to play with selected settings from fields activity - if user made a choice
         setupTableToPlay();
-        //todo: provide Letter to play according to selection in difficulty activity - if available
-
-
         //Fetch keyListener from EditText fields in table
         EditText editTextCity = (EditText) findViewById(R.id.edit_text_city);
         editTextCityKeyListener = editTextCity.getKeyListener();
@@ -82,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent intentTable = new Intent(MainActivity.this, TableActivity.class);
                 startActivity(intentTable);
                 return true;
-            case R.id.difficulty:
+            case difficulty:
                 //Start third activity: difficulty
                 Intent intentDifficulty = new Intent(MainActivity.this, DifficultyActivity.class);
                 startActivity(intentDifficulty);
@@ -95,7 +96,9 @@ public class MainActivity extends AppCompatActivity {
 
     //Start button: selected letter and stop button are displayed, stop watch is reset, text entry in table is enabled
     public void startGame(View view) {
-        selectLetter();
+        //display Letter selected in Difficulty Activity
+        //todo: select new letter each time start button is clicked
+        showSelectLetter();
         //reset & start stop watch
         chronometer = (Chronometer) findViewById(R.id.chronometer);
         chronometer.stop();
@@ -162,17 +165,8 @@ public class MainActivity extends AppCompatActivity {
     //todo: calculate score from correct fields * difficulty * score from Time
     private void calculateScore() {
         int score = 0;
-        int difficulty = 0;
-        //check, which difficulty is selected (radio button) and multiply with score (1, 2, 3)
-        RadioGroup selectDifficultyRadioGroup = (RadioGroup) findViewById(R.id.radio_group_select_difficulty);
-        int checkedId = selectDifficultyRadioGroup.getCheckedRadioButtonId();
-        if (checkedId == R.id.radiobutton_easy) {
-            difficulty = 1;
-        } else if (checkedId == R.id.radiobutton_middle) {
-            difficulty = 2;
-        } else {
-            difficulty = 3;
-        }
+        int difficulty = 1;
+        difficulty = difficultyFromBundle();         //get difficulty info from activity
 
         //todo: check for correct answers, each correct answer adds 1 point
         //calculate score
@@ -183,19 +177,29 @@ public class MainActivity extends AppCompatActivity {
         selectedLetterText.setText(getString(R.string.your_score_is) + " " + showScore + " points");
     }
 
-    //Read selected level of difficulty from radio group, chose random letter for difficulty selected, display letter
-    private void selectLetter() {
+    //Get selectedLetter from Bundle from Difficulty Activity
+    private int difficultyFromBundle() {
+        Bundle letterBundle  = getIntent().getExtras();
+        int difficulty = 1;
+        if(letterBundle != null) {
+            difficulty = letterBundle.containsKey("Difficulty") ? letterBundle.getInt("Difficulty") : 1;
+        }
+        return difficulty;
+    }
+
+    //get difficulty from Bundle, make random Letter selection, and display
+    private void showSelectLetter() {
         String selectedLetter = "A";
+        int difficulty = 1;
+        difficulty = difficultyFromBundle();         //get difficulty info from activity
+        //random select letter
         Random randomLetter = new Random();
         String easyLetters = getString(R.string.easy_letters);
         String middleLetters = getString(R.string.middle_letters);
         String hardLetters = getString(R.string.hard_letters);
-        //check, which difficulty is selected (radio button) and select random letter according to difficulty
-        RadioGroup selectDifficultyRadioGroup = (RadioGroup) findViewById(R.id.radio_group_select_difficulty);
-        int checkedId = selectDifficultyRadioGroup.getCheckedRadioButtonId();
-        if (checkedId == R.id.radiobutton_easy) {
+        if (difficulty == 1) {
             selectedLetter = String.valueOf(easyLetters.charAt(randomLetter.nextInt(easyLetters.length())));
-        } else if (checkedId == R.id.radiobutton_middle) {
+        } else if (difficulty == 2) {
             selectedLetter = String.valueOf(middleLetters.charAt(randomLetter.nextInt(middleLetters.length())));
         } else {
             selectedLetter = String.valueOf(hardLetters.charAt(randomLetter.nextInt(hardLetters.length())));
@@ -214,18 +218,10 @@ public class MainActivity extends AppCompatActivity {
         boolean mountainSelected = true;
         Bundle fields  = getIntent().getExtras();
         if(fields != null) {
-            citySelected = fields.getBoolean("City");
-            countrySelected = fields.getBoolean("Country");
-            riverSelected = fields.getBoolean("River");
-            mountainSelected = fields.getBoolean("Mountain");
-            //todo delete log
-            //String forLog = fields.get("Mountain").toString();
-            //Log.i("country", forLog);
-        } else {
-            citySelected = true;
-            countrySelected = true;
-            riverSelected = true;
-            mountainSelected = true;
+            citySelected = fields.containsKey("City") ? fields.getBoolean("City") : true;
+            countrySelected = fields.containsKey("Country") ? fields.getBoolean("Country") : true;
+            riverSelected = fields.containsKey("River") ? fields.getBoolean("River") : true;
+            mountainSelected = fields.containsKey("Mountain") ? fields.getBoolean("Mountain") : true;
         }
         //Each field to play (column) is made visible/gone depending on checkbox, here: "city"
         TextView cityTableHead = (TextView) findViewById(R.id.table_head_city);

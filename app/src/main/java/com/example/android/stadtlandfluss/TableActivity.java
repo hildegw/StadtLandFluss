@@ -29,7 +29,7 @@ public class TableActivity extends AppCompatActivity {
         return true;
     }
 
-    //Handle Toolbar Icon click events
+    //Handle Toolbar Icon click events, hand over Bundle containing table information to main acitivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle presses on the action bar items
@@ -47,7 +47,7 @@ public class TableActivity extends AppCompatActivity {
     }
 
     //todo keep selection when switching activities
-    //Identify checked boxes and hand over to main acitivity
+    //Identify checked boxes and hand over to Toolbar click-function above
     private Bundle findBoxesChecked() {
         Bundle checkedBoxes = new Bundle();
         CheckBox cityCheckBox = (CheckBox) findViewById(R.id.play_checkbox_city);
