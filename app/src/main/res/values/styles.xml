@@ -14,23 +14,23 @@
         <item name="android:background">@color/colorPrimaryDark</item>
         <item name="android:textSize">18sp</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:textColor">#ffffff</item>
+        <item name="android:textColor">@color/colorTextLight</item>
     </style>
 
     <style name="editTextRow">
         <item name="android:gravity">center_horizontal</item>
         <item name="android:padding">5dp</item>
         <item name="android:layout_margin">1dp</item>
-        <item name="android:background">#C5CAE9</item>
+        <item name="android:background">@color/colorPrimaryLight</item>
         <item name="android:textSize">18sp</item>
-        <item name="android:textColor">#ffffff</item>
+        <item name="android:textColor">@color/colorTextLight</item>
         <item name="android:inputType">textCapWords</item>
         <item name="android:maxLines">1</item>
     </style>
 
     <style name="tableRow">
         <item name="android:gravity">center_horizontal</item>
-        <item name="android:background">#ffffff</item>
+        <item name="android:background">@color/colorTextLight</item>
     </style>
 
     <style name="button">
@@ -39,7 +39,7 @@
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">18sp</item>
         <item name="android:textAllCaps">true</item>
-        <item name="android:textColor">#ffffff</item>
+        <item name="android:textColor">@color/colorTextLight</item>
         <item name="android:layout_width">96dp</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginTop">8dp</item>
@@ -56,7 +56,7 @@
         <item name="android:layout_marginRight">36dp</item>
         <item name="android:textSize">18sp</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:textColor">#ffffff</item>
+        <item name="android:textColor">@color/colorTextLight</item>
     </style>
 
     <style name="checkBox">

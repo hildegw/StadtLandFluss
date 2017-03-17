@@ -6,6 +6,7 @@ import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.method.KeyListener;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,6 +14,12 @@ import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.Random;
 
@@ -27,14 +34,13 @@ public class MainActivity extends AppCompatActivity {
     private KeyListener editTextMountainKeyListener;
     private Toolbar myToolbar;
 
-    //todo: keep status when switching to landscape
-    //todo: arrange table in blocks above each other / center fields!?
-    //todo: data base!!!! getText from editText
-    //todo: adjust difficulty according to database entries
+    //todo: keep status when switching activities and when switching to landscape
     //todo: add game icon and background icon b/W
-    //todo: add navigation drawer for settings and home, see example code
-    //todo: educational - link to Wiki
+    //todo: data base!!!! getText from editText
     //todo: colors.xml
+    //todo: adjust difficulty according to database entries
+    //todo: educational - link to Wiki
+    //todo: arrange table in blocks above each other / center fields!?
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,7 +100,6 @@ public class MainActivity extends AppCompatActivity {
     //Start button: selected letter and stop button are displayed, stop watch is reset, text entry in table is enabled
     public void startGame(View view) {
         //display Letter selected in Difficulty Activity
-        //todo: select new letter each time start button is clicked
         showSelectLetter();
         //reset & start stop watch
         chronometer = (Chronometer) findViewById(R.id.chronometer);
@@ -166,6 +171,28 @@ public class MainActivity extends AppCompatActivity {
         difficulty = difficultyFromBundle();         //get difficulty info from activity
 
         //todo: check for correct answers, each correct answer adds 1 point
+        //todo: test write to DB --- limit access and implement default values!
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference("message");
+        myRef.setValue("Hello, World!");
+
+        //Todo: Read from the database
+        myRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+                String value = dataSnapshot.getValue(String.class);
+                Log.i("Value is: ", value);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                Log.w("Failed to read value.", error.toException());
+            }
+        });
+
         //calculate score
         score = timeScore() * difficulty;
         //display score

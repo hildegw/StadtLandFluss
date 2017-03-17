@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "673661410724",
+    "firebase_url": "https://stadtlandfluss-3e479.firebaseio.com",
+    "project_id": "stadtlandfluss-3e479",
+    "storage_bucket": "stadtlandfluss-3e479.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:673661410724:android:5fc578234f56b746",
+        "android_client_info": {
+          "package_name": "com.example.android.stadtlandfluss"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "673661410724-rnsvruhf8asdat9f9v4bfpe849t26c4u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.android.stadtlandfluss",
+            "certificate_hash": "d18b7e2b5ea682372ba31be8af22457178cc6d84"
+          }
+        },
+        {
+          "client_id": "673661410724-v4uiq422rns0cihtj1rcbp9iouul1okt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCXUOAQrBE_cJ4a5aT6B1l6S7XrXoCW_14"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "673661410724-v4uiq422rns0cihtj1rcbp9iouul1okt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
