@@ -21,12 +21,17 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import static com.example.android.stadtlandfluss.R.id.difficulty;
 
 public class MainActivity extends AppCompatActivity {
 
+    public String selectedLetter;
     private Chronometer chronometer;
     private KeyListener editTextCityKeyListener;
     private KeyListener editTextCountryKeyListener;
@@ -146,6 +151,8 @@ public class MainActivity extends AppCompatActivity {
         editTextRiver.setKeyListener(null);
         EditText editTextMountain = (EditText) findViewById(R.id.edit_text_mountain);
         editTextMountain.setKeyListener(null);
+        //pass letter to DB and read lists for city, country, river, mountain
+        readGeoNamesFromDB();
         //calculate and display score, unhide score bar
         TextView scoreBar = (TextView) findViewById(R.id.your_score_is);
         scoreBar.setVisibility(View.VISIBLE);
@@ -164,6 +171,7 @@ public class MainActivity extends AppCompatActivity {
         return scoreFromTime;
     }
 
+
     //todo: calculate score from correct fields * difficulty * score from Time
     private void calculateScore() {
         int score = 0;
@@ -171,27 +179,6 @@ public class MainActivity extends AppCompatActivity {
         difficulty = difficultyFromBundle();         //get difficulty info from activity
 
         //todo: check for correct answers, each correct answer adds 1 point
-        //todo: test write to DB --- limit access and implement default values!
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("message");
-        myRef.setValue("Hello, World!");
-
-        //Todo: Read from the database
-        myRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // This method is called once with the initial value and again
-                // whenever data at this location is updated.
-                String value = dataSnapshot.getValue(String.class);
-                Log.i("Value is: ", value);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-                // Failed to read value
-                Log.w("Failed to read value.", error.toException());
-            }
-        });
 
         //calculate score
         score = timeScore() * difficulty;
@@ -200,6 +187,34 @@ public class MainActivity extends AppCompatActivity {
         TextView selectedLetterText = (TextView) findViewById(R.id.your_score_is);
         selectedLetterText.setText(getString(R.string.your_score_is) + " " + showScore + " points");
     }
+
+    //inititate firebase DB for selected letter with press of stop button
+    private void readGeoNamesFromDB() {
+        //get DB reference for selected letter
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        //todo: remove "A" after DB setup is complete !!!!!!
+        selectedLetter = "A";
+        DatabaseReference dbRef = database.getReference(selectedLetter);
+
+        //Read all geografic names from the database that start with the selected letter
+        //todo: read only DB entries selected as table fields
+        dbRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Map<String, Object> td = (HashMap<String, Object>) dataSnapshot.getValue();
+                List<Object> values = new ArrayList<>(td.values());
+                //todo: delete
+                Log.i("Value is: ", String.valueOf(values));
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                Log.w("Failed to read value.", error.toException());
+            }
+        });
+    }
+
 
     //Get selectedLetter from Bundle from Difficulty Activity
     private int difficultyFromBundle() {
@@ -211,9 +226,9 @@ public class MainActivity extends AppCompatActivity {
         return difficulty;
     }
 
-    //get difficulty from Bundle, make random Letter selection, and display
+    //get difficulty from Bundle, make random Letter selection, display, and return letter
     private void showSelectLetter() {
-        String selectedLetter = "A";
+        selectedLetter = "A";
         int difficulty = 1;
         difficulty = difficultyFromBundle();         //get difficulty info from activity
         //random select letter
@@ -231,6 +246,7 @@ public class MainActivity extends AppCompatActivity {
         //display letter
         TextView selectedLetterText = (TextView) findViewById(R.id.letter_to_play);
         selectedLetterText.setText(getString(R.string.letter_to_play) + " " + selectedLetter);
+        //return letter for further use in DB read;
     }
 
     //Provide fields to play in table based on boxes checked
