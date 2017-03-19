@@ -1,5 +1,6 @@
 package com.example.android.stadtlandfluss;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -10,6 +11,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.EditText;
@@ -41,13 +43,21 @@ public class MainActivity extends AppCompatActivity {
     private KeyListener editTextMountainKeyListener;
     private Toolbar myToolbar;
 
+    //todo: make sure that complete word is compared (e.g. not just "Q") in compareTableFieldsWithGeoNames
+    //todo: feed DB
     //todo: keep status when switching activities and when switching to landscape
     //todo: add game icon and background icon b/W
-    //todo: data base!!!! getText from editText
-    //todo: colors.xml
-    //todo: adjust difficulty according to database entries
-    //todo: educational - link to Wiki, Scattergories
-    //todo: arrange table in blocks above each other / center fields!?
+    //todo: present score more explicitly in calculateScore()
+    //todo: limit compare to each category, compare each word of a name in compareTableFieldsWithGeoNames
+    //todo: catch error if no DB entry exists for selected letter in readGeoNamesFromDB
+    //todo: remove Logs
+    /* nice to haves
+    //get rid of public variables
+    //adjust difficulty according to database entries in strings.xml
+    //read only DB entries selected as table fields
+    //educational - link to Wiki, Scattergories
+    //arrange table in blocks above each other / center fields!?
+    */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,12 +113,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
     //Start button: selected letter and stop button are displayed, stop watch is reset, text entry in table is enabled
     public void startGame(View view) {
         //display Letter selected in Difficulty Activity
         showSelectLetter();
-        //read lists for city, country, river, mountain for selected letter - needs to be done early
+        //read lists for city, country, river, mountain for selected letter
+        //needs to be called early, otherwise global variable geoNamesString will be null
         readGeoNamesFromDB();
         //reset & start stop watch
         chronometer = (Chronometer) findViewById(R.id.chronometer);
@@ -120,6 +130,9 @@ public class MainActivity extends AppCompatActivity {
         startButton.setVisibility(View.GONE);
         Button stopButton = (Button) findViewById(R.id.stop_button);
         stopButton.setVisibility(View.VISIBLE);
+        //Hide score bar if visible
+        TextView scoreText = (TextView) findViewById(R.id.your_score_is);
+        scoreText.setVisibility(View.GONE);
         //clear EditText with Start and enable text entry
         EditText editTextCity = (EditText) findViewById(R.id.edit_text_city);
         editTextCity.setText("");
@@ -133,11 +146,13 @@ public class MainActivity extends AppCompatActivity {
         EditText editTextMountain = (EditText) findViewById(R.id.edit_text_mountain);
         editTextMountain.setText("");
         editTextMountain.setKeyListener(editTextMountainKeyListener);
-        //todo: hide keyboard after reset
     }
 
     //Stop button: start button is displayed, watch stops,text entry in table is disabled
     public void stopGame(View view) {
+        //close keyboard
+        InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputManager.hideSoftInputFromWindow((null == getCurrentFocus()) ? null : getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
         //replace stop with start button
         Button startButton = (Button) findViewById(R.id.start_button);
         startButton.setVisibility(View.VISIBLE);
@@ -161,28 +176,14 @@ public class MainActivity extends AppCompatActivity {
         calculateScore();
     }
 
-    //calculate score from time elapsed: each minute reduces score of 10 by one point, max 10 points possible.
-    private int timeScore() {
-        int scoreFromTime = 0;
-        //get Time elapsed and convert into score (each minute used reduces score of 10)
-        long saveTime = SystemClock.elapsedRealtime() - chronometer.getBase();
-        int timeElapsed = (int)(saveTime/1000);
-        if(timeElapsed / 60 < 10) {
-            scoreFromTime = 10 - timeElapsed / 60;
-        }
-        return scoreFromTime;
-    }
-
 
     //inititate firebase DB for selected letter - called by compareTableFieldsWithGeoNames()
     private void readGeoNamesFromDB() {
         //get DB reference for selected letter
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        selectedLetter = "A"; //todo: remove "A" after DB setup is complete !!!!!!
-        geoNamesString = "XXXX"; //setting up geo names string, because it will take time to read from firebase
+        geoNamesString = "XXXX"; //setting up default geo names string just in case read from firebase takes longer
         DatabaseReference dbRef = database.getReference(selectedLetter);
         //Read all geografic names from the database that start with the selected letter
-        //todo: read only DB entries selected as table fields
         dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -199,23 +200,39 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //copmare user table entries with geo names for every field
-    //todo limit compare to each category, compare each word of a name
-    private boolean compareTableFieldsWithGeoNames() {
+    private int compareTableFieldsWithGeoNames() {
+        int correctFieldsCount = 0;
         //get user's table input - if it exists
         TextView cityTableField = (TextView) findViewById(R.id.edit_text_city);
         String cityTableEntry = cityTableField.getText().toString();
         //check, if table entry is found in geo names string
-        if (cityTableEntry.matches("")) {
-            return false;
-        } else {
+        if (!cityTableEntry.matches("") && geoNamesString.contains(cityTableEntry)) {
             Log.i("City entered is: ", cityTableEntry); //todo remove
-            return geoNamesString.contains(cityTableEntry);
+            correctFieldsCount++;
         }
-        //todo: other fields
+        //repeat for all fields
+        TextView countryTableField = (TextView) findViewById(R.id.edit_text_country);
+        String countryTableEntry = countryTableField.getText().toString();
+        if (!countryTableEntry.matches("") && geoNamesString.contains(countryTableEntry)) {
+            Log.i("country entered is: ", countryTableEntry); //todo remove
+            correctFieldsCount++;
+        }
+        TextView riverTableField = (TextView) findViewById(R.id.edit_text_river);
+        String riverTableEntry = riverTableField.getText().toString();
+        if (!riverTableEntry.matches("") && geoNamesString.contains(riverTableEntry)) {
+            Log.i("river entered is: ", riverTableEntry); //todo remove
+            correctFieldsCount++;
+        }
+        TextView mountainTableField = (TextView) findViewById(R.id.edit_text_mountain);
+        String mountainTableEntry = mountainTableField.getText().toString();
+        if (!mountainTableEntry.matches("") && geoNamesString.contains(mountainTableEntry)) {
+            Log.i("mountain entered is: ", mountainTableEntry); //todo remove
+            correctFieldsCount++;
+        }
+        return correctFieldsCount;
     }
 
-
-    //Get selectedLetter from Bundle from Difficulty Activity
+    //Get difficulty from Bundle handed over from Difficulty Activity
     private int difficultyFromBundle() {
         Bundle letterBundle  = getIntent().getExtras();
         int difficulty = 1;
@@ -225,10 +242,10 @@ public class MainActivity extends AppCompatActivity {
         return difficulty;
     }
 
-    //get difficulty from Bundle, make random Letter selection, display, and return letter
+    //make random Letter selection, display, and store letter in variable
     private void showSelectLetter() {
-        selectedLetter = "A";
-        int difficulty = 1;
+        selectedLetter = "A";                        //set default
+        int difficulty;
         difficulty = difficultyFromBundle();         //get difficulty info from activity
         //random select letter
         Random randomLetter = new Random();
@@ -245,7 +262,6 @@ public class MainActivity extends AppCompatActivity {
         //display letter
         TextView selectedLetterText = (TextView) findViewById(R.id.letter_to_play);
         selectedLetterText.setText(getString(R.string.letter_to_play) + " " + selectedLetter);
-        //return letter for further use in DB read;
     }
 
     //Provide fields to play in table based on boxes checked
@@ -308,25 +324,29 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-    //todo: calculate score from correct fields * difficulty * score from Time
-    private void calculateScore() {
-        int score = 0;
-        int difficulty = 1;
-        difficulty = difficultyFromBundle();         //get difficulty info from activity
-
-        //todo check for correct answers, each correct answer adds 1 point
-        //check user entries versus database
-        boolean correctCity = compareTableFieldsWithGeoNames();
-        Log.i("Value is: ", valueOf(correctCity)); //todo remove
-        Log.i("geo ", geoNamesString); //todo remove
-
-        //calculate score
-        score = timeScore() * difficulty;
-        //display score
-        String showScore = valueOf(score);
-        TextView selectedLetterText = (TextView) findViewById(R.id.your_score_is);
-        selectedLetterText.setText(getString(R.string.your_score_is) + " " + showScore + " points");
+    //calculate score from time elapsed: each minute reduces score of 10 by one point, max 10 points possible.
+    private int timeScore() {
+        int scoreFromTime = 0;
+        //get Time elapsed and convert into score (each minute used reduces score of 10)
+        long saveTime = SystemClock.elapsedRealtime() - chronometer.getBase();
+        int timeElapsed = (int)(saveTime/1000);
+        if(timeElapsed / 60 < 10) {
+            scoreFromTime = 10 - timeElapsed / 60;
+        }
+        return scoreFromTime;
     }
 
+    //calculate score from correct fields * difficulty * score from Time
+    private void calculateScore() {
+        int difficulty = difficultyFromBundle();                    //get difficulty info from activity
+        int correctFieldsCount = compareTableFieldsWithGeoNames();  //get correct fields count
+        int score = timeScore() * difficulty * correctFieldsCount;  //calculate score
+        //display score
+        String showScore = valueOf(score);
+        TextView scoreText = (TextView) findViewById(R.id.your_score_is);
+        scoreText.setText(getString(R.string.your_score_is) + " " + showScore + " points");
+        Log.i("Value is: ", valueOf(correctFieldsCount)); //todo remove
+        Log.i("geo ", geoNamesString); //todo remove
+
+    }
 }

@@ -6,9 +6,9 @@
     <string name="checkbox_river">River</string>
     <string name="checkbox_mountain">Mountain</string>
     <string name="select_difficulty">Please choose your level of difficulty</string>
-    <string name="select_difficulty_easy">Easy, e.g. A, M, S</string>
-    <string name="select_difficulty_middle">Medium, e.g. B, P, U</string>
-    <string name="select_difficulty_hard">Hard, e.g. I, W, X</string>
+    <string name="select_difficulty_easy">Easy letters</string>
+    <string name="select_difficulty_middle">Medium letters</string>
+    <string name="select_difficulty_hard">Hard letters</string>
     <string name="start_button">start</string>
     <string name="stop_button">stop</string>
     <string name="letter_to_play">Letter:</string>
@@ -18,8 +18,8 @@
     <string name="show_score">Stop and Show Score</string>
     <string name="your_score_is">You scored</string>
     <string name="start_game">Plaese press START</string>
-    <string name="easy_letters">ADEFMNRST</string>
-    <string name="middle_letters">BCGHJKLPU</string>
+    <string name="easy_letters">ACDEFNRST</string>
+    <string name="middle_letters">BGHJKLMPU</string>
     <string name="hard_letters">IOQVWXYZ</string>
 </resources>
 
