@@ -41,7 +41,6 @@ public class MainActivity extends AppCompatActivity {
     private KeyListener editTextCountryKeyListener;
     private KeyListener editTextRiverKeyListener;
     private KeyListener editTextMountainKeyListener;
-    private Toolbar myToolbar;
 
     //todo: make sure that complete word is compared (e.g. not just "Q") in compareTableFieldsWithGeoNames
     //todo: feed DB
@@ -50,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     //todo: present score more explicitly in calculateScore()
     //todo: limit compare to each category, compare each word of a name in compareTableFieldsWithGeoNames
     //todo: catch error if no DB entry exists for selected letter in readGeoNamesFromDB
+    //todo: login to DB
     //todo: remove Logs
     /* nice to haves
     //get rid of public variables
