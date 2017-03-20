@@ -40,10 +40,12 @@
         <item name="android:textSize">18sp</item>
         <item name="android:textAllCaps">true</item>
         <item name="android:textColor">@color/colorTextLight</item>
-        <item name="android:layout_width">96dp</item>
+        <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginTop">8dp</item>
         <item name="android:layout_marginBottom">24dp</item>
+        <item name="android:layout_marginLeft">36dp</item>
+        <item name="android:layout_marginRight">36dp</item>
     </style>
 
     <style name="highlightedText">
@@ -53,11 +55,26 @@
         <item name="android:gravity">center</item>
         <item name="android:layout_weight">1</item>
         <item name="android:layout_marginTop">8dp</item>
-        <item name="android:layout_marginLeft">36dp</item>
-        <item name="android:layout_marginRight">36dp</item>
+        <item name="android:layout_marginLeft">38dp</item>
+        <item name="android:layout_marginRight">38dp</item>
         <item name="android:textSize">18sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/colorTextLight</item>
+    </style>
+
+    <style name="scoreMessage">
+        <item name="android:background">@drawable/rounded_lining</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">@color/colorTextDark</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:layout_marginBottom">24dp</item>
+        <item name="android:layout_marginLeft">36dp</item>
+        <item name="android:layout_marginRight">36dp</item>
     </style>
 
     <style name="checkBox">

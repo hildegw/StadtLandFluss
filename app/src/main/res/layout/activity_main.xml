@@ -44,7 +44,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="120dp"
+                    android:layout_marginTop="132dp"
                     android:orientation="horizontal">
 
                     <Button
@@ -136,7 +136,8 @@
 
                 <TextView
                     android:id="@+id/your_score_is"
-                    style="@style/highlightedText"
+                    android:layout_marginTop="16dp"
+                    style="@style/scoreMessage"
                     android:padding="8dp"
                     android:text="" />
 

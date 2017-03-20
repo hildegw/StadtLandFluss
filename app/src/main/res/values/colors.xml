@@ -6,7 +6,7 @@
     <color name="colorAccent">#FF9100</color>
     <color name="colorAccentLight">#FFAB40</color>
     <color name="colorTextLight">#FFFFFF</color>
-    <color name="colorTextDark">#111111</color>
+    <color name="colorTextDark">#455A64</color>
 </resources>
 
 <!-- http://www.sankk.in/material-mixer/ -->

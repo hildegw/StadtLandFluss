@@ -344,9 +344,19 @@ public class MainActivity extends AppCompatActivity {
         //display score
         String showScore = valueOf(score);
         TextView scoreText = (TextView) findViewById(R.id.your_score_is);
-        scoreText.setText(getString(R.string.your_score_is) + " " + showScore + " points");
+        if(score <= 30){
+            scoreText.setText(getString(R.string.your_score_is) + " " + showScore + " points.\n"
+                + "Try again!");
+        } else if(30 < score && score <= 80) {
+            scoreText.setText(getString(R.string.your_score_is) + " " + showScore + " points.\n"
+                    + "Not bad - try again!");
+        } else if (score > 80) {
+            scoreText.setText(getString(R.string.your_score_is) + " " + showScore + " points.\n"
+                    + "You are a true expert!");
+        } else
+            scoreText.setText("Try again!");
+
         Log.i("Value is: ", valueOf(correctFieldsCount)); //todo remove
         Log.i("geo ", geoNamesString); //todo remove
-
     }
 }
