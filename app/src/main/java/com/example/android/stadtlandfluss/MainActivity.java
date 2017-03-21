@@ -3,7 +3,6 @@ package com.example.android.stadtlandfluss;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.method.KeyListener;
@@ -29,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import static android.os.SystemClock.elapsedRealtime;
 import static com.example.android.stadtlandfluss.R.id.difficulty;
 import static java.lang.String.valueOf;
 
@@ -120,42 +120,77 @@ public class MainActivity extends AppCompatActivity {
         // Store UI state to the savedInstanceState. This bundle will be passed to onCreate on next call.
         chronometer = (Chronometer) findViewById(R.id.chronometer);
         savedInstanceState.putLong("Chronometer", chronometer.getBase());
+
         savedInstanceState.putString("SelectedLetter", selectedLetter);
 
         Button stopButton = (Button) findViewById(R.id.stop_button);
         savedInstanceState.putInt("StopButton", stopButton.getVisibility());
 
+        TextView scoreBar = (TextView) findViewById(R.id.your_score_is);
+        savedInstanceState.putInt("ScoreBar", scoreBar.getVisibility());
+        savedInstanceState.putCharSequence("ScoreText", scoreBar.getText());
 
     }
 
 
-    //todo click on stop crashes app after flipping
+    //todo click on stop crashes app after flipping: restore DB and score, table???
     //todo restore saved instance from savedInstanceState, e.g. when phone is flipped
     public void onRestoreInstanceState(Bundle savedInstanceState){
         super.onRestoreInstanceState(savedInstanceState);
-        //reset content view: Button visibility
-        setContentView(R.layout.activity_main);
+        //restore Start/Stop Button visibility and view according to game status
         if((savedInstanceState !=null) && savedInstanceState.containsKey("StopButton")) {
             Button stopButton = (Button) findViewById(R.id.stop_button);
             Button startButton = (Button) findViewById(R.id.start_button);
+            chronometer = (Chronometer) findViewById(R.id.chronometer);
+            TextView scoreBar = (TextView) findViewById(R.id.your_score_is);
+            TextView selectedLetterText = (TextView) findViewById(R.id.letter_to_play);
             int stopButtonVisibility = savedInstanceState.getInt("StopButton");
-            Log.i("Stop ", valueOf(stopButtonVisibility));
+            Log.i("Stop ", valueOf(stopButtonVisibility)); //todo remove
+            //restore status: game is started
             if (stopButtonVisibility == 0) {
                 stopButton.setVisibility(View.VISIBLE);
                 startButton.setVisibility(View.GONE);
+                //chronometer continues counting
+                if(savedInstanceState.containsKey("Chronometer")) {
+                    long chronoTime;
+                    chronoTime = savedInstanceState.getLong("Chronometer");
+                    chronometer.setBase(chronoTime - elapsedRealtime()); //todo: set correct base
+                    chronometer.start();
+                }
+                //restore selected letter and display
+                if(savedInstanceState.containsKey("SelectedLetter")) {
+                    selectedLetter = savedInstanceState.getString("SelectedLetter");
+                    selectedLetterText.setText(getString(R.string.letter_to_play) + " " + selectedLetter);
+                }
+            //status: game is stopped
             } else {
                 stopButton.setVisibility(View.GONE);
                 startButton.setVisibility(View.VISIBLE);
+                //chronometer is stopped and shows stop time
+                if(savedInstanceState.containsKey("Chronometer")) {
+                    long chronoTime;
+                    chronoTime = savedInstanceState.getLong("Chronometer");
+                    chronometer.setBase(chronoTime); //todo: set correct base
+                }
+                //restore score text
+                if(savedInstanceState.containsKey("ScoreBar")) {
+                    int scoreBarVisibility = savedInstanceState.getInt("ScoreBar");
+                    if (scoreBarVisibility == 0) {
+                        scoreBar.setVisibility(View.VISIBLE);
+                        scoreBar.setText(savedInstanceState.getCharSequence("ScoreText"));
+                    } else {
+                        scoreBar.setVisibility(View.GONE);
+                    }
+                }
             }
+
+        } else {
+            onCreate(savedInstanceState);
         }
 
-        if((savedInstanceState !=null) && savedInstanceState.containsKey("Chronometer")) {
-            long chronoTime;
-            chronometer = (Chronometer) findViewById(R.id.chronometer);
-            chronoTime = savedInstanceState.getLong("Chronometer");
-            chronometer.setBase(chronoTime - SystemClock.elapsedRealtime()); //todo: set correct base
 
-        }
+
+
 
         if((savedInstanceState !=null) && savedInstanceState.containsKey("SelectedLetter")) {
             selectedLetter = savedInstanceState.getString("SelectedLetter");
@@ -185,7 +220,7 @@ public class MainActivity extends AppCompatActivity {
         //reset & start stop watch
         chronometer = (Chronometer) findViewById(R.id.chronometer);
         chronometer.stop();
-        chronometer.setBase(SystemClock.elapsedRealtime());
+        chronometer.setBase(elapsedRealtime());
         chronometer.start();
         //Hide start button and show stop button
         Button startButton = (Button) findViewById(R.id.start_button);
@@ -390,7 +425,7 @@ public class MainActivity extends AppCompatActivity {
     private int timeScore() {
         int scoreFromTime = 0;
         //get Time elapsed and convert into score (each minute used reduces score of 10)
-        long saveTime = SystemClock.elapsedRealtime() - chronometer.getBase();
+        long saveTime = elapsedRealtime() - chronometer.getBase();
         int timeElapsed = (int)(saveTime/1000);
         if(timeElapsed / 60 < 10) {
             scoreFromTime = 10 - timeElapsed / 60;
@@ -419,6 +454,6 @@ public class MainActivity extends AppCompatActivity {
             scoreText.setText("Try again!");
 
         Log.i("Value is: ", valueOf(correctFieldsCount)); //todo remove
-        Log.i("geo ", geoNamesString); //todo remove
+        //Log.i("geo ", geoNamesString); //todo remove
     }
 }
