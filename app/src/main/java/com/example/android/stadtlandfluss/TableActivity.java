@@ -46,7 +46,6 @@ public class TableActivity extends AppCompatActivity {
         }
     }
 
-    //todo keep selection when switching activities
     //Identify checked boxes and hand over to Toolbar click-function above
     private Bundle findBoxesChecked() {
         Bundle checkedBoxes = new Bundle();

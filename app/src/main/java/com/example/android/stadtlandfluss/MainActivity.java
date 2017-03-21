@@ -96,7 +96,6 @@ public class MainActivity extends AppCompatActivity {
     //Handle Toolbar Icon click events
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle presses on the action bar items
         switch (item.getItemId()) {
             case R.id.table:
                 //Start second activity: table
@@ -112,6 +111,69 @@ public class MainActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+
+    //todo store state in State Bundle
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState)
+    {
+        super.onSaveInstanceState(savedInstanceState);
+        // Store UI state to the savedInstanceState. This bundle will be passed to onCreate on next call.
+        chronometer = (Chronometer) findViewById(R.id.chronometer);
+        savedInstanceState.putLong("Chronometer", chronometer.getBase());
+        savedInstanceState.putString("SelectedLetter", selectedLetter);
+
+        Button stopButton = (Button) findViewById(R.id.stop_button);
+        savedInstanceState.putInt("StopButton", stopButton.getVisibility());
+
+
+    }
+
+
+    //todo click on stop crashes app after flipping
+    //todo restore saved instance from savedInstanceState, e.g. when phone is flipped
+    public void onRestoreInstanceState(Bundle savedInstanceState){
+        super.onRestoreInstanceState(savedInstanceState);
+        //reset content view: Button visibility
+        setContentView(R.layout.activity_main);
+        if((savedInstanceState !=null) && savedInstanceState.containsKey("StopButton")) {
+            Button stopButton = (Button) findViewById(R.id.stop_button);
+            Button startButton = (Button) findViewById(R.id.start_button);
+            int stopButtonVisibility = savedInstanceState.getInt("StopButton");
+            Log.i("Stop ", valueOf(stopButtonVisibility));
+            if (stopButtonVisibility == 0) {
+                stopButton.setVisibility(View.VISIBLE);
+                startButton.setVisibility(View.GONE);
+            } else {
+                stopButton.setVisibility(View.GONE);
+                startButton.setVisibility(View.VISIBLE);
+            }
+        }
+
+        if((savedInstanceState !=null) && savedInstanceState.containsKey("Chronometer")) {
+            long chronoTime;
+            chronometer = (Chronometer) findViewById(R.id.chronometer);
+            chronoTime = savedInstanceState.getLong("Chronometer");
+            chronometer.setBase(chronoTime - SystemClock.elapsedRealtime()); //todo: set correct base
+
+        }
+
+        if((savedInstanceState !=null) && savedInstanceState.containsKey("SelectedLetter")) {
+            selectedLetter = savedInstanceState.getString("SelectedLetter");
+        }
+
+
+
+
+
+
+    }
+
+
+
+
+
+
+
 
     //Start button: selected letter and stop button are displayed, stop watch is reset, text entry in table is enabled
     public void startGame(View view) {
