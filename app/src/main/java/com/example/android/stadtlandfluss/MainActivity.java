@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
     //todo: make sure that complete word is compared (e.g. not just "Q") in compareTableFieldsWithGeoNames
     //todo: feed DB
-    //todo: keep status when switching activities and when switching to landscape
+    //todo: keep status when switching activities
     //todo: add game icon and background icon b/W
     //todo: present score more explicitly in calculateScore()
     //todo: limit compare to each category, compare each word of a name in compareTableFieldsWithGeoNames
@@ -53,6 +53,9 @@ public class MainActivity extends AppCompatActivity {
     //todo: remove Logs
     /* nice to haves
     //get rid of public variables
+    //more elegant handling of saving instances
+    //close keyboard when done
+    //do not show same letter after restart
     //adjust difficulty according to database entries in strings.xml
     //read only DB entries selected as table fields
     //educational - link to Wiki, Scattergories
@@ -112,29 +115,23 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //todo store state in State Bundle
+    //save current stat in instance bundle
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState)
     {
         super.onSaveInstanceState(savedInstanceState);
-        // Store UI state to the savedInstanceState. This bundle will be passed to onCreate on next call.
         chronometer = (Chronometer) findViewById(R.id.chronometer);
         savedInstanceState.putLong("Chronometer", chronometer.getBase());
-
         savedInstanceState.putString("SelectedLetter", selectedLetter);
-
+        savedInstanceState.putString("GeoNamesString", geoNamesString);
         Button stopButton = (Button) findViewById(R.id.stop_button);
         savedInstanceState.putInt("StopButton", stopButton.getVisibility());
-
-        TextView scoreBar = (TextView) findViewById(R.id.your_score_is);
-        savedInstanceState.putInt("ScoreBar", scoreBar.getVisibility());
-        savedInstanceState.putCharSequence("ScoreText", scoreBar.getText());
-
+        TextView scoreText = (TextView) findViewById(R.id.your_score_is);
+        savedInstanceState.putInt("ScoreBar", scoreText.getVisibility());
+        savedInstanceState.putCharSequence("ScoreText", scoreText.getText());
     }
 
-
-    //todo click on stop crashes app after flipping: restore DB and score, table???
-    //todo restore saved instance from savedInstanceState, e.g. when phone is flipped
+    //restore saved instance from savedInstanceState
     public void onRestoreInstanceState(Bundle savedInstanceState){
         super.onRestoreInstanceState(savedInstanceState);
         //restore Start/Stop Button visibility and view according to game status
@@ -154,13 +151,17 @@ public class MainActivity extends AppCompatActivity {
                 if(savedInstanceState.containsKey("Chronometer")) {
                     long chronoTime;
                     chronoTime = savedInstanceState.getLong("Chronometer");
-                    chronometer.setBase(chronoTime - elapsedRealtime()); //todo: set correct base
+                    chronometer.setBase(chronoTime);
                     chronometer.start();
                 }
                 //restore selected letter and display
                 if(savedInstanceState.containsKey("SelectedLetter")) {
                     selectedLetter = savedInstanceState.getString("SelectedLetter");
                     selectedLetterText.setText(getString(R.string.letter_to_play) + " " + selectedLetter);
+                }
+                //restore geo names variable
+                if(savedInstanceState.containsKey("GeoNamesString")) {
+                    geoNamesString = savedInstanceState.getString("GeoNamesString");
                 }
             //status: game is stopped
             } else {
@@ -170,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
                 if(savedInstanceState.containsKey("Chronometer")) {
                     long chronoTime;
                     chronoTime = savedInstanceState.getLong("Chronometer");
-                    chronometer.setBase(chronoTime); //todo: set correct base
+                    chronometer.setBase(chronoTime);
                 }
                 //restore score text
                 if(savedInstanceState.containsKey("ScoreBar")) {
@@ -183,32 +184,10 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
-
         } else {
             onCreate(savedInstanceState);
         }
-
-
-
-
-
-        if((savedInstanceState !=null) && savedInstanceState.containsKey("SelectedLetter")) {
-            selectedLetter = savedInstanceState.getString("SelectedLetter");
-        }
-
-
-
-
-
-
     }
-
-
-
-
-
-
-
 
     //Start button: selected letter and stop button are displayed, stop watch is reset, text entry in table is enabled
     public void startGame(View view) {
@@ -453,7 +432,7 @@ public class MainActivity extends AppCompatActivity {
         } else
             scoreText.setText("Try again!");
 
-        Log.i("Value is: ", valueOf(correctFieldsCount)); //todo remove
-        //Log.i("geo ", geoNamesString); //todo remove
+        Log.i("Score: ", valueOf(correctFieldsCount)); //todo remove
+        Log.i("geo ", geoNamesString); //todo remove
     }
 }
