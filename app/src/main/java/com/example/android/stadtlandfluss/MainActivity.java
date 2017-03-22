@@ -252,7 +252,6 @@ public class MainActivity extends AppCompatActivity {
         calculateScore();
     }
 
-
     //inititate firebase DB for selected letter - called by compareTableFieldsWithGeoNames()
     private void readGeoNamesFromDB() {
         //get DB reference for selected letter
@@ -263,9 +262,23 @@ public class MainActivity extends AppCompatActivity {
         dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Map<String, Object> td = (HashMap<String, Object>) dataSnapshot.getValue();
-                List<Object> geoNames = new ArrayList<>(td.values());
+                Map<String, Object> dbMapForLetter = (HashMap<String, Object>) dataSnapshot.getValue();
+                List<Object> geoNames = new ArrayList<>(dbMapForLetter.values());
                 geoNamesString = String.valueOf(geoNames);
+
+                //todo check word match with db
+                //get user's table input - if it exists
+                TextView cityTableField = (TextView) findViewById(R.id.edit_text_city);
+                String cityTableEntry = cityTableField.getText().toString();
+                Log.i("user Entry", cityTableEntry);
+
+
+                boolean yes = geoNames.contains(cityTableEntry);
+                Log.i("db String", geoNamesString);
+                String[] split = geoNamesString.split(",");         //todo  split works, need to compare each element with user entry now
+                for (int i = 0; i < split.length; i++) {
+                    Log.i("split", split[i]);
+                }
             }
             @Override
             public void onCancelled(DatabaseError error) {
@@ -321,8 +334,7 @@ public class MainActivity extends AppCompatActivity {
     //make random Letter selection, display, and store letter in variable
     private void showSelectLetter() {
         selectedLetter = "A";                        //set default
-        int difficulty;
-        difficulty = difficultyFromBundle();         //get difficulty info from activity
+        int difficulty = difficultyFromBundle();     //get difficulty info from activity
         //random select letter
         Random randomLetter = new Random();
         String easyLetters = getString(R.string.easy_letters);

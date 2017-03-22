@@ -66,10 +66,6 @@ public class DifficultyActivity extends AppCompatActivity {
         letterBundle.putInt("Difficulty", difficulty);
         return letterBundle;
     }
-
-
-
-
 }
 
 
