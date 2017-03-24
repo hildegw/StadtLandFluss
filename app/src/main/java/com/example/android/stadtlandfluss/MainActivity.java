@@ -265,20 +265,6 @@ public class MainActivity extends AppCompatActivity {
                 Map<String, Object> dbMapForLetter = (HashMap<String, Object>) dataSnapshot.getValue();
                 List<Object> geoNames = new ArrayList<>(dbMapForLetter.values());
                 geoNamesString = String.valueOf(geoNames);
-
-                //todo check word match with db
-                //get user's table input - if it exists
-                TextView cityTableField = (TextView) findViewById(R.id.edit_text_city);
-                String cityTableEntry = cityTableField.getText().toString();
-                Log.i("user Entry", cityTableEntry);
-
-
-                boolean yes = geoNames.contains(cityTableEntry);
-                Log.i("db String", geoNamesString);
-                String[] split = geoNamesString.split(",");         //todo  split works, need to compare each element with user entry now
-                for (int i = 0; i < split.length; i++) {
-                    Log.i("split", split[i]);
-                }
             }
             @Override
             public void onCancelled(DatabaseError error) {
@@ -291,32 +277,49 @@ public class MainActivity extends AppCompatActivity {
     //copmare user table entries with geo names for every field
     private int compareTableFieldsWithGeoNames() {
         int correctFieldsCount = 0;
-        //get user's table input - if it exists
+        //get user's table input
         TextView cityTableField = (TextView) findViewById(R.id.edit_text_city);
         String cityTableEntry = cityTableField.getText().toString();
-        //check, if table entry is found in geo names string
-        if (!cityTableEntry.matches("") && geoNamesString.contains(cityTableEntry)) {
-            Log.i("City entered is: ", cityTableEntry); //todo remove
-            correctFieldsCount++;
-        }
-        //repeat for all fields
         TextView countryTableField = (TextView) findViewById(R.id.edit_text_country);
         String countryTableEntry = countryTableField.getText().toString();
-        if (!countryTableEntry.matches("") && geoNamesString.contains(countryTableEntry)) {
-            Log.i("country entered is: ", countryTableEntry); //todo remove
-            correctFieldsCount++;
-        }
         TextView riverTableField = (TextView) findViewById(R.id.edit_text_river);
         String riverTableEntry = riverTableField.getText().toString();
-        if (!riverTableEntry.matches("") && geoNamesString.contains(riverTableEntry)) {
-            Log.i("river entered is: ", riverTableEntry); //todo remove
-            correctFieldsCount++;
-        }
         TextView mountainTableField = (TextView) findViewById(R.id.edit_text_mountain);
         String mountainTableEntry = mountainTableField.getText().toString();
-        if (!mountainTableEntry.matches("") && geoNamesString.contains(mountainTableEntry)) {
-            Log.i("mountain entered is: ", mountainTableEntry); //todo remove
-            correctFieldsCount++;
+        String[] splitGeoNames = geoNamesString.split(",");
+        Log.i("db String", geoNamesString);
+        //check, if user table entries are found in geo names string
+        for (int i = 0; i < splitGeoNames.length; i++) {
+            //get each DB entry and remove spaces and brackets
+            String compareEachGeoName = splitGeoNames[i].trim().replace("[", "").replace("]", "");
+            //check if user entry for city exists and if it starts with the correct letter
+            if (!cityTableEntry.matches("") && geoNamesString.contains(cityTableEntry)) {
+                //compare if user entry matches one of the Geo Names in DB
+                //Log.i("city", cityTableEntry);
+                //Log.i("comp", valueOf(compareEachGeoName));
+                if (cityTableEntry.equals(compareEachGeoName)) {
+                    correctFieldsCount++;
+                    Log.i("fields count: ", valueOf(correctFieldsCount));
+                }
+            }
+            //check user entry for country 
+            if (!countryTableEntry.matches("") && geoNamesString.contains(countryTableEntry)) {
+                if (countryTableEntry.equals(compareEachGeoName)) {
+                    correctFieldsCount++;
+                }
+            }
+            //check user entry for river
+            if (!riverTableEntry.matches("") && geoNamesString.contains(riverTableEntry)) {
+                if (riverTableEntry.equals(compareEachGeoName)) {
+                    correctFieldsCount++;
+                }
+            }
+            //check user entry for mountain
+            if (!mountainTableEntry.matches("") && geoNamesString.contains(mountainTableEntry)) {
+                if (mountainTableEntry.equals(compareEachGeoName)) {
+                    correctFieldsCount++;
+                }
+            }
         }
         return correctFieldsCount;
     }
@@ -444,7 +447,7 @@ public class MainActivity extends AppCompatActivity {
         } else
             scoreText.setText("Try again!");
 
-        Log.i("Score: ", valueOf(correctFieldsCount)); //todo remove
-        Log.i("geo ", geoNamesString); //todo remove
+        //Log.i("Score: ", valueOf(correctFieldsCount)); //todo remove
+        //Log.i("geo ", geoNamesString); //todo remove
     }
 }
