@@ -42,14 +42,13 @@ public class MainActivity extends AppCompatActivity {
     private KeyListener editTextRiverKeyListener;
     private KeyListener editTextMountainKeyListener;
 
-    //todo: make sure that complete word is compared (e.g. not just "Q") in compareTableFieldsWithGeoNames
     //todo: feed DB
     //todo: keep status when switching activities
-    //todo: add game icon and background icon b/W
-    //todo: present score more explicitly in calculateScore()
+    //todo: work on design, game icon and background
     //todo: limit compare to each category, compare each word of a name in compareTableFieldsWithGeoNames
     //todo: catch error if no DB entry exists for selected letter in readGeoNamesFromDB
     //todo: login to DB
+    //todo: add info/help
     //todo: remove Logs
     /* nice to haves
     //get rid of public variables
@@ -415,15 +414,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //calculate score from time elapsed: each minute reduces score of 10 by one point, max 10 points possible.
+    //calculate score from time elapsed: each 10s reduce score of 10 by one point, max 10 points possible.
     private int timeScore() {
         int scoreFromTime = 0;
         //get Time elapsed and convert into score (each minute used reduces score of 10)
-        long saveTime = elapsedRealtime() - chronometer.getBase();
-        int timeElapsed = (int)(saveTime/1000);
-        if(timeElapsed / 60 < 10) {
-            scoreFromTime = 10 - timeElapsed / 60;
+        long timePlayed = elapsedRealtime() - chronometer.getBase();
+        int timeElapsed = (int)(timePlayed/1000);
+        Log.i("timeElapsed", valueOf(timeElapsed));
+        if(timeElapsed < 100) {
+            scoreFromTime = (100 - timeElapsed) / 10;
         }
+        Log.i("score from time", valueOf(scoreFromTime));
         return scoreFromTime;
     }
 
