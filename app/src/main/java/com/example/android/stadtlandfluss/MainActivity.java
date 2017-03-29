@@ -22,6 +22,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,21 +43,25 @@ public class MainActivity extends AppCompatActivity {
     private KeyListener editTextRiverKeyListener;
     private KeyListener editTextMountainKeyListener;
 
-    //todo: feed DB
-    //todo: keep status when switching activities
-    //todo: work on design, game icon and background
-    //todo: limit compare to each category, compare each word of a name in compareTableFieldsWithGeoNames
+    //todo: get feedback
+    //todo: show if user entry is found in DB
+    //todo: take care of Umlaute, ss, and common names for river and mount
+    //todo: test on different devices
+    //todo: keep status when switching activities (remove Table Activity)
+    //todo: limit compare to each category
     //todo: catch error if no DB entry exists for selected letter in readGeoNamesFromDB
     //todo: login to DB
     //todo: add info/help
     //todo: remove Logs
     /* nice to haves
+    //work on design for portrait/landscape, update background img
     //get rid of public variables
     //more elegant handling of saving instances
     //close keyboard when done
     //do not show same letter after restart
     //adjust difficulty according to database entries in strings.xml
     //read only DB entries selected as table fields
+    //add highscore
     //educational - link to Wiki, Scattergories
     //arrange table in blocks above each other / center fields!?
     */
@@ -251,12 +256,12 @@ public class MainActivity extends AppCompatActivity {
         calculateScore();
     }
 
-    //inititate firebase DB for selected letter - called by compareTableFieldsWithGeoNames()
+    //inititate firebase DB for selected letter - called by startGame()
     private void readGeoNamesFromDB() {
         //get DB reference for selected letter
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         geoNamesString = "XXXX"; //setting up default geo names string just in case read from firebase takes longer
-        DatabaseReference dbRef = database.getReference(selectedLetter);
+        DatabaseReference dbRef = database.getReference(selectedLetter.toLowerCase());
         //Read all geografic names from the database that start with the selected letter
         dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -278,45 +283,71 @@ public class MainActivity extends AppCompatActivity {
         int correctFieldsCount = 0;
         //get user's table input
         TextView cityTableField = (TextView) findViewById(R.id.edit_text_city);
-        String cityTableEntry = cityTableField.getText().toString();
+        String cityTableEntry = cityTableField.getText().toString().toLowerCase();
         TextView countryTableField = (TextView) findViewById(R.id.edit_text_country);
-        String countryTableEntry = countryTableField.getText().toString();
+        String countryTableEntry = countryTableField.getText().toString().toLowerCase();
         TextView riverTableField = (TextView) findViewById(R.id.edit_text_river);
-        String riverTableEntry = riverTableField.getText().toString();
+        String riverTableEntry = riverTableField.getText().toString().toLowerCase();
         TextView mountainTableField = (TextView) findViewById(R.id.edit_text_mountain);
-        String mountainTableEntry = mountainTableField.getText().toString();
+        String mountainTableEntry = mountainTableField.getText().toString().toLowerCase();
+        //use only "alhpa" characters
+        String cityNormalized =
+                Normalizer
+                        .normalize(cityTableEntry, Normalizer.Form.NFD)
+                        .replaceAll("[^\\p{ASCII}]", "");
+        String countryNormalized =
+                Normalizer
+                        .normalize(countryTableEntry, Normalizer.Form.NFD)
+                        .replaceAll("[^\\p{ASCII}]", "");
+        String riverNormalized =
+                Normalizer
+                        .normalize(riverTableEntry, Normalizer.Form.NFD)
+                        .replaceAll("[^\\p{ASCII}]", "");
+        String mountainNormalized =
+                Normalizer
+                        .normalize(mountainTableEntry, Normalizer.Form.NFD)
+                        .replaceAll("[^\\p{ASCII}]", "");
+        //split string with Geonames from DB into Array of names
         String[] splitGeoNames = geoNamesString.split(",");
-        Log.i("db String", geoNamesString);
+        //keep track of correct entries for user feedback and to avoid double score counts
+        Boolean correctCityEntry = false;
+        Boolean correctCountryEntry = false;
+        Boolean correctRiverEntry = false;
+        Boolean correctMountainEntry = false;
+        //Log.i("geoNames from DB String", geoNamesString);
+        //Log.i("city entry normalized", cityNormalized);
         //check, if user table entries are found in geo names string
         for (int i = 0; i < splitGeoNames.length; i++) {
             //get each DB entry and remove spaces and brackets
             String compareEachGeoName = splitGeoNames[i].trim().replace("[", "").replace("]", "");
             //check if user entry for city exists and if it starts with the correct letter
-            if (!cityTableEntry.matches("") && geoNamesString.contains(cityTableEntry)) {
+            if (!correctCityEntry && !cityTableEntry.matches("") && geoNamesString.contains(cityNormalized)) {
                 //compare if user entry matches one of the Geo Names in DB
-                //Log.i("city", cityTableEntry);
                 //Log.i("comp", valueOf(compareEachGeoName));
-                if (cityTableEntry.equals(compareEachGeoName)) {
+                if (cityNormalized.equals(compareEachGeoName)) {
                     correctFieldsCount++;
-                    Log.i("fields count: ", valueOf(correctFieldsCount));
+                    correctCityEntry = true;
                 }
             }
             //check user entry for country 
-            if (!countryTableEntry.matches("") && geoNamesString.contains(countryTableEntry)) {
-                if (countryTableEntry.equals(compareEachGeoName)) {
+            if (!correctCountryEntry && !countryTableEntry.matches("") && geoNamesString.contains(countryNormalized)) {
+                if (countryNormalized.equals(compareEachGeoName)) {
                     correctFieldsCount++;
+                    correctCountryEntry = true;
                 }
             }
             //check user entry for river
-            if (!riverTableEntry.matches("") && geoNamesString.contains(riverTableEntry)) {
-                if (riverTableEntry.equals(compareEachGeoName)) {
+            if (!correctRiverEntry && !riverTableEntry.matches("") && geoNamesString.contains(riverNormalized)) {
+                if (riverNormalized.equals(compareEachGeoName)) {
                     correctFieldsCount++;
+                    correctRiverEntry = true;
                 }
             }
             //check user entry for mountain
-            if (!mountainTableEntry.matches("") && geoNamesString.contains(mountainTableEntry)) {
-                if (mountainTableEntry.equals(compareEachGeoName)) {
+            if (!correctMountainEntry && !mountainTableEntry.matches("") && geoNamesString.contains(mountainNormalized)) {
+                if (mountainNormalized.equals(compareEachGeoName)) {
                     correctFieldsCount++;
+                    correctMountainEntry = true;
                 }
             }
         }
@@ -414,7 +445,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //calculate score from time elapsed: each 10s reduce score of 10 by one point, max 10 points possible.
+    //calculate score from time elapsed: each 20s reduce score of 10 by one point, max 10 points possible.
     private int timeScore() {
         int scoreFromTime = 0;
         //get Time elapsed and convert into score (each minute used reduces score of 10)
@@ -422,7 +453,7 @@ public class MainActivity extends AppCompatActivity {
         int timeElapsed = (int)(timePlayed/1000);
         Log.i("timeElapsed", valueOf(timeElapsed));
         if(timeElapsed < 100) {
-            scoreFromTime = (100 - timeElapsed) / 10;
+            scoreFromTime = (100 - timeElapsed) / 20;
         }
         Log.i("score from time", valueOf(scoreFromTime));
         return scoreFromTime;
@@ -448,7 +479,6 @@ public class MainActivity extends AppCompatActivity {
         } else
             scoreText.setText("Try again!");
 
-        //Log.i("Score: ", valueOf(correctFieldsCount)); //todo remove
-        //Log.i("geo ", geoNamesString); //todo remove
+        Log.i("correct fields: ", valueOf(correctFieldsCount)); //todo remove
     }
 }
