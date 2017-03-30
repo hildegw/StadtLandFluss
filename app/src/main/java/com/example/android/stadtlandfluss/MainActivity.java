@@ -30,8 +30,6 @@ import java.util.Map;
 import java.util.Random;
 
 import static android.os.SystemClock.elapsedRealtime;
-import static com.example.android.stadtlandfluss.R.color.colorAccentLight;
-import static com.example.android.stadtlandfluss.R.color.colorPrimaryLight;
 import static com.example.android.stadtlandfluss.R.id.difficulty;
 import static java.lang.String.valueOf;
 
@@ -39,6 +37,10 @@ public class MainActivity extends AppCompatActivity {
 
     public String selectedLetter;
     public String geoNamesString;
+    private Boolean correctCityEntry = false;
+    private Boolean correctCountryEntry = false;
+    private Boolean correctRiverEntry = false;
+    private Boolean correctMountainEntry = false;
     private Chronometer chronometer;
     private KeyListener editTextCityKeyListener;
     private KeyListener editTextCountryKeyListener;
@@ -46,8 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private KeyListener editTextMountainKeyListener;
 
     //todo: get feedback
-    //todo: redo DB normalization e.g. ü = u
-    //todo: keep green fields when flipping
+    //todo: duplicate entries in DB where common names are reduced, e.g. mount everest
     //todo: disable Fields Selection Menu and upload to Playstore
     //todo: test on different devices
     //todo: keep status when switching activities (remove Table Activity)
@@ -92,6 +93,11 @@ public class MainActivity extends AppCompatActivity {
         //hide bar that shows score
         TextView scoreBar = (TextView) findViewById(R.id.your_score_is);
         scoreBar.setVisibility(View.GONE);
+        //set correct fields entry count to false
+        correctCityEntry = false;
+        correctCountryEntry = false;
+        correctRiverEntry = false;
+        correctMountainEntry = false;
     }
 
     // Menu icons in toolbar are inflated just as with actionbar
@@ -135,11 +141,21 @@ public class MainActivity extends AppCompatActivity {
         TextView scoreText = (TextView) findViewById(R.id.your_score_is);
         savedInstanceState.putInt("ScoreBar", scoreText.getVisibility());
         savedInstanceState.putCharSequence("ScoreText", scoreText.getText());
+        //get color state from edit text fields
+        savedInstanceState.putBoolean("CityFieldColor", correctCityEntry);
+        savedInstanceState.putBoolean("CountryFieldColor", correctCountryEntry);
+        savedInstanceState.putBoolean("RiverFieldColor", correctRiverEntry);
+        savedInstanceState.putBoolean("MountainFieldColor", correctMountainEntry);
     }
 
     //restore saved instance from savedInstanceState
     public void onRestoreInstanceState(Bundle savedInstanceState){
         super.onRestoreInstanceState(savedInstanceState);
+        //set correct fields entry count to false, remove green background from fields
+        correctCityEntry = false;
+        correctCountryEntry = false;
+        correctRiverEntry = false;
+        correctMountainEntry = false;
         //restore Start/Stop Button visibility and view according to game status
         if((savedInstanceState !=null) && savedInstanceState.containsKey("StopButton")) {
             Button stopButton = (Button) findViewById(R.id.stop_button);
@@ -178,6 +194,8 @@ public class MainActivity extends AppCompatActivity {
                     long chronoTime;
                     chronoTime = savedInstanceState.getLong("Chronometer");
                     chronometer.setBase(chronoTime);
+                    chronometer.stop();
+                    //chronometer.setBase(chronoTime-elapsedRealtime()/60);
                 }
                 //restore score text
                 if(savedInstanceState.containsKey("ScoreBar")) {
@@ -188,6 +206,27 @@ public class MainActivity extends AppCompatActivity {
                     } else {
                         scoreBar.setVisibility(View.GONE);
                     }
+                }
+                //restore background color for edit text fields
+                if (savedInstanceState.containsKey("CityFieldColor") && savedInstanceState.getBoolean("CityFieldColor")) {
+                    EditText editTextCity = (EditText) findViewById(R.id.edit_text_city);
+                    editTextCity.setBackgroundColor(getColor(R.color.green));
+                    correctCityEntry = true;
+                }
+                if (savedInstanceState.containsKey("CountryFieldColor") && savedInstanceState.getBoolean("CountryFieldColor")) {
+                    EditText editTextCountry = (EditText) findViewById(R.id.edit_text_country);
+                    editTextCountry.setBackgroundColor(getColor(R.color.green));
+                    correctCountryEntry = true;
+                }
+                if (savedInstanceState.containsKey("RiverFieldColor") && savedInstanceState.getBoolean("RiverFieldColor")) {
+                    EditText editTextRiver = (EditText) findViewById(R.id.edit_text_river);
+                    editTextRiver.setBackgroundColor(getColor(R.color.green));
+                    correctRiverEntry = true;
+                }
+                if (savedInstanceState.containsKey("MountainFieldColor") && savedInstanceState.getBoolean("MountainFieldColor")) {
+                    EditText editTextMountain = (EditText) findViewById(R.id.edit_text_mountain);
+                    editTextMountain.setBackgroundColor(getColor(R.color.green));
+                    correctMountainEntry = true;
                 }
             }
         } else {
@@ -232,6 +271,11 @@ public class MainActivity extends AppCompatActivity {
         editTextMountain.setText("");
         editTextMountain.setBackgroundColor(getColor(R.color.colorPrimaryLight));
         editTextMountain.setKeyListener(editTextMountainKeyListener);
+        //set correct fields entry count to false, reset background color
+        correctCityEntry = false;
+        correctCountryEntry = false;
+        correctRiverEntry = false;
+        correctMountainEntry = false;
     }
 
     //Stop button: start button is displayed, watch stops,text entry in table is disabled
@@ -313,9 +357,14 @@ public class MainActivity extends AppCompatActivity {
                 Normalizer
                         .normalize(mountainTableEntry, Normalizer.Form.NFD)
                         .replaceAll("[^\\p{ASCII}]", "");
+        String geoNamesStringNormalize =
+                Normalizer
+                        .normalize(geoNamesString, Normalizer.Form.NFD)
+                        .replaceAll("[^\\p{ASCII}]", "");
+        Log.i("geo norm", geoNamesStringNormalize);
         //Remove generic words, e.g. river from Geonames String and user entry
         String[] wordsToRemove = new String[] {"river", "rivier", "mount", "mont", "piz", "col", "cima", "cerro", "mt.", "mt", "monte", "gunung", "rio", "creek"};
-        String geoNamesReduced = geoNamesString;
+        String geoNamesReduced = geoNamesStringNormalize;
         String cityNormalizedReduced = cityNormalized;
         String countryNormalizedReduced = countryNormalized;
         String riverNormalizedReduced = riverNormalized;
@@ -327,18 +376,13 @@ public class MainActivity extends AppCompatActivity {
             riverNormalizedReduced = riverNormalizedReduced.replace(wordsToRemove[i], "").trim();
             mountainNormalizedReduced = mountainNormalizedReduced.replace(wordsToRemove[i], "").trim();
         }
-        Log.i("geoNamesReduce", geoNamesReduced);
+        /*Log.i("geoNamesReduce", geoNamesReduced);
         Log.i("city normal", cityNormalizedReduced);
         Log.i("country normal", countryNormalizedReduced);
         Log.i("river normal", riverNormalizedReduced);
-        Log.i("mountain normal", mountainNormalizedReduced);
+        Log.i("mountain normal", mountainNormalizedReduced);*/
         //split string with Geonames from DB into Array of names
         String[] splitGeoNames = geoNamesReduced.split(",");
-        //keep track of correct entries for user feedback and to avoid double score counts
-        Boolean correctCityEntry = false;
-        Boolean correctCountryEntry = false;
-        Boolean correctRiverEntry = false;
-        Boolean correctMountainEntry = false;
         //check, if user table entries are found in geo names string
         for (int i = 0; i < splitGeoNames.length; i++) {
             //get each DB entry and remove spaces and brackets
@@ -346,38 +390,38 @@ public class MainActivity extends AppCompatActivity {
             //check if user entry for city exists and if it starts with the correct letter
             if (!correctCityEntry && !cityNormalizedReduced.matches("") && geoNamesReduced.contains(cityNormalizedReduced)) {
                 //compare if user entry matches one of the Geo Names in DB
-                Log.i("geo comapre with city", compareEachGeoName);
+                //Log.i("geo comapre with city", compareEachGeoName);
                 if (cityNormalizedReduced.equals(compareEachGeoName)) {
                     correctFieldsCount++;
                     correctCityEntry = true;
-                    Log.i("correctCityEntry", valueOf(correctCityEntry));
+                    //Log.i("correctCityEntry", valueOf(correctCityEntry));
                 }
             }
             //check user entry for country 
             if (!correctCountryEntry && !countryNormalizedReduced.matches("") && geoNamesReduced.contains(countryNormalizedReduced)) {
-                Log.i("geo compare w country", compareEachGeoName);
+                //Log.i("geo compare w country", compareEachGeoName);
                 if (countryNormalizedReduced.equals(compareEachGeoName)) {
                     correctFieldsCount++;
                     correctCountryEntry = true;
-                    Log.i("correctCountryEntry", valueOf(correctCountryEntry));
+                    //Log.i("correctCountryEntry", valueOf(correctCountryEntry));
                 }
             }
             //check user entry for river
             if (!correctRiverEntry && !riverNormalizedReduced.matches("") && geoNamesReduced.contains(riverNormalizedReduced)) {
-                Log.i("geo compare w river", compareEachGeoName);
+                //Log.i("geo compare w river", compareEachGeoName);
                 if (riverNormalizedReduced.equals(compareEachGeoName)) {
                     correctFieldsCount++;
                     correctRiverEntry = true;
-                    Log.i("correctRiverEntry", valueOf(correctRiverEntry));
+                    //Log.i("correctRiverEntry", valueOf(correctRiverEntry));
                 }
             }
             //check user entry for mountain
             if (!correctMountainEntry && !mountainNormalizedReduced.matches("") && geoNamesReduced.contains(mountainNormalizedReduced)) {
-                Log.i("geo compare w mountain", compareEachGeoName);
+                //Log.i("geo compare w mountain", compareEachGeoName);
                 if (mountainNormalizedReduced.equals(compareEachGeoName)) {
                     correctFieldsCount++;
                     correctMountainEntry = true;
-                    Log.i("correctMountainEntry", valueOf(correctMountainEntry));
+                    //Log.i("correctMountainEntry", valueOf(correctMountainEntry));
                 }
             }
         }
@@ -488,15 +532,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //calculate score from time elapsed: each 20s reduce score of 10 by one point, max 10 points possible.
+    //calculate score from time elapsed: each 30s reduce score of 10 by one point, max 10 points possible.
     private int timeScore() {
         int scoreFromTime = 0;
         //get Time elapsed and convert into score (each minute used reduces score of 10)
         long timePlayed = elapsedRealtime() - chronometer.getBase();
         int timeElapsed = (int)(timePlayed/1000);
         Log.i("timeElapsed", valueOf(timeElapsed));
-        if(timeElapsed < 100) {
-            scoreFromTime = (100 - timeElapsed) / 20;
+        if(timeElapsed < 300) {
+            scoreFromTime = (300 - timeElapsed) / 30 +1;
         }
         Log.i("score from time", valueOf(scoreFromTime));
         return scoreFromTime;
@@ -506,21 +550,25 @@ public class MainActivity extends AppCompatActivity {
     private void calculateScore() {
         int difficulty = difficultyFromBundle();                    //get difficulty info from activity
         int correctFieldsCount = compareTableFieldsWithGeoNames();  //get correct fields count
-        int score = timeScore() * difficulty * correctFieldsCount;  //calculate score
+        int scoreFromTime = timeScore();                            //get score from time
+        int score = scoreFromTime * difficulty * correctFieldsCount;  //calculate score
         //display score
         String showScore = valueOf(score);
         TextView scoreText = (TextView) findViewById(R.id.your_score_is);
-        if(score <= 30){
+        if(score <= 30) {
             scoreText.setText(getString(R.string.your_score_is) + " " + showScore + " points.\n"
-                + "Try again!");
-        } else if(30 < score && score <= 80) {
-            scoreText.setText(getString(R.string.your_score_is) + " " + showScore + " points.\n"
-                    + "Not bad - try again!");
-        } else if (score > 80) {
-            scoreText.setText(getString(R.string.your_score_is) + " " + showScore + " points.\n"
+                    + "difficulty: " + difficulty + "\n" + "time score: " + scoreFromTime + "\n" + "coorect answers: " + correctFieldsCount + "\n"
+                    +  "Try again!");
+                } else if(30 < score && score <= 80) {
+                    scoreText.setText(getString(R.string.your_score_is) + " " + showScore + " points.\n"
+                    + "difficulty: " + difficulty + "\n" + "time score: " + scoreFromTime + "\n" + "coorect answers: " + correctFieldsCount + "\n"
+                    + " Not bad!");
+                } else if (score > 80) {
+                    scoreText.setText(getString(R.string.your_score_is) + " " + showScore + " points.\n"
+                    + "difficulty: " + difficulty + "\n" + "time score: " + scoreFromTime + "\n" + "correct answers: " + correctFieldsCount + "\n"
                     + "You are a true expert!");
-        } else
-            scoreText.setText("Try again!");
+                } else
+                    scoreText.setText("Try again!");
 
         Log.i("correct fields: ", valueOf(correctFieldsCount)); //todo remove
     }
