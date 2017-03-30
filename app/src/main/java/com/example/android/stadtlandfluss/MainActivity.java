@@ -46,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
     private KeyListener editTextMountainKeyListener;
 
     //todo: get feedback
+    //todo: redo DB normalization e.g. ü = u
+    //todo: keep green fields when flipping
     //todo: disable Fields Selection Menu and upload to Playstore
     //todo: test on different devices
     //todo: keep status when switching activities (remove Table Activity)
@@ -213,7 +215,7 @@ public class MainActivity extends AppCompatActivity {
         //Hide score bar if visible
         TextView scoreText = (TextView) findViewById(R.id.your_score_is);
         scoreText.setVisibility(View.GONE);
-        //clear EditText with Start and enable text entry
+        //clear EditText with Start and enable text entry; reset background to primary light
         EditText editTextCity = (EditText) findViewById(R.id.edit_text_city);
         editTextCity.setText("");
         editTextCity.setBackgroundColor(getColor(R.color.colorPrimaryLight));
@@ -316,7 +318,7 @@ public class MainActivity extends AppCompatActivity {
         String geoNamesReduced = geoNamesString;
         String cityNormalizedReduced = cityNormalized;
         String countryNormalizedReduced = countryNormalized;
-        String riverNormalizedReduced = countryNormalized;
+        String riverNormalizedReduced = riverNormalized;
         String mountainNormalizedReduced = mountainNormalized;
         for (int i = 0; i < wordsToRemove.length; i++) {
             geoNamesReduced = geoNamesReduced.replace(wordsToRemove[i], "");
@@ -325,6 +327,11 @@ public class MainActivity extends AppCompatActivity {
             riverNormalizedReduced = riverNormalizedReduced.replace(wordsToRemove[i], "").trim();
             mountainNormalizedReduced = mountainNormalizedReduced.replace(wordsToRemove[i], "").trim();
         }
+        Log.i("geoNamesReduce", geoNamesReduced);
+        Log.i("city normal", cityNormalizedReduced);
+        Log.i("country normal", countryNormalizedReduced);
+        Log.i("river normal", riverNormalizedReduced);
+        Log.i("mountain normal", mountainNormalizedReduced);
         //split string with Geonames from DB into Array of names
         String[] splitGeoNames = geoNamesReduced.split(",");
         //keep track of correct entries for user feedback and to avoid double score counts
@@ -332,8 +339,6 @@ public class MainActivity extends AppCompatActivity {
         Boolean correctCountryEntry = false;
         Boolean correctRiverEntry = false;
         Boolean correctMountainEntry = false;
-        //Log.i("geoNames reduced", geoNamesReduced);
-        //Log.i("city entry final", cityNormalizedReduced);
         //check, if user table entries are found in geo names string
         for (int i = 0; i < splitGeoNames.length; i++) {
             //get each DB entry and remove spaces and brackets
@@ -341,31 +346,38 @@ public class MainActivity extends AppCompatActivity {
             //check if user entry for city exists and if it starts with the correct letter
             if (!correctCityEntry && !cityNormalizedReduced.matches("") && geoNamesReduced.contains(cityNormalizedReduced)) {
                 //compare if user entry matches one of the Geo Names in DB
-                //Log.i("geo", compareEachGeoName);
+                Log.i("geo comapre with city", compareEachGeoName);
                 if (cityNormalizedReduced.equals(compareEachGeoName)) {
                     correctFieldsCount++;
                     correctCityEntry = true;
+                    Log.i("correctCityEntry", valueOf(correctCityEntry));
                 }
             }
             //check user entry for country 
             if (!correctCountryEntry && !countryNormalizedReduced.matches("") && geoNamesReduced.contains(countryNormalizedReduced)) {
+                Log.i("geo compare w country", compareEachGeoName);
                 if (countryNormalizedReduced.equals(compareEachGeoName)) {
                     correctFieldsCount++;
                     correctCountryEntry = true;
+                    Log.i("correctCountryEntry", valueOf(correctCountryEntry));
                 }
             }
             //check user entry for river
             if (!correctRiverEntry && !riverNormalizedReduced.matches("") && geoNamesReduced.contains(riverNormalizedReduced)) {
+                Log.i("geo compare w river", compareEachGeoName);
                 if (riverNormalizedReduced.equals(compareEachGeoName)) {
                     correctFieldsCount++;
                     correctRiverEntry = true;
+                    Log.i("correctRiverEntry", valueOf(correctRiverEntry));
                 }
             }
             //check user entry for mountain
             if (!correctMountainEntry && !mountainNormalizedReduced.matches("") && geoNamesReduced.contains(mountainNormalizedReduced)) {
+                Log.i("geo compare w mountain", compareEachGeoName);
                 if (mountainNormalizedReduced.equals(compareEachGeoName)) {
                     correctFieldsCount++;
                     correctMountainEntry = true;
+                    Log.i("correctMountainEntry", valueOf(correctMountainEntry));
                 }
             }
         }
