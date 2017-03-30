@@ -7,6 +7,7 @@
     <color name="colorAccentLight">#FFAB40</color>
     <color name="colorTextLight">#FFFFFF</color>
     <color name="colorTextDark">#455A64</color>
+    <color name="green">#81C784</color>
 </resources>
 
 <!-- http://www.sankk.in/material-mixer/ -->
