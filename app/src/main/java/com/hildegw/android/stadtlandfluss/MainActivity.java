@@ -17,8 +17,6 @@ import android.widget.Chronometer;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.hildegw.android.stadtlandfluss.DifficultyActivity;
-import com.hildegw.android.stadtlandfluss.TableActivity;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -59,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
     */
 
     public static final String PREFS_NAME = "MyPrefsFile";
+    private static FirebaseDatabase database;
     private int difficultySelected;
     private String selectedLetter;
     private String geoNamesString;
@@ -82,6 +81,13 @@ public class MainActivity extends AppCompatActivity {
         //hide stop button
         Button stopButton = (Button) findViewById(R.id.stop_button);
         stopButton.setVisibility(View.GONE);
+        //initializing Firebase DB and making it available for offline use
+        if(database == null) {
+            database = FirebaseDatabase.getInstance();
+            database.setPersistenceEnabled(true);
+        }
+        //FirebaseDatabase database = FirebaseDatabase.getInstance();
+
         //Setup table to play with selected settings from fields activity - if user made a choice
         setupTableToPlay();
         //Fetch keyListener from EditText fields in table
@@ -315,10 +321,9 @@ public class MainActivity extends AppCompatActivity {
         calculateScore();
     }
 
-    //inititate firebase DB for selected letter - called by startGame()
+    //get the geo names for selected letter - called by startGame()
     private void readGeoNamesFromDB() {
         //get DB reference for selected letter
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
         geoNamesString = "XXXX"; //setting up default geo names string just in case read from firebase takes longer
         DatabaseReference dbRef = database.getReference(selectedLetter.toLowerCase());
         //Read all geografic names from the database that start with the selected letter
