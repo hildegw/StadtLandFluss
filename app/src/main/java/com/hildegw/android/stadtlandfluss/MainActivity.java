@@ -35,19 +35,14 @@ import static java.lang.String.valueOf;
 
 public class MainActivity extends AppCompatActivity {
 
-    //todo: get feedback
     //todo: duplicate entries in DB where common names are reduced, e.g. mount everest
     //todo: upload to Playstore, add copyright/impressum
-    //todo: test on different devices
     //todo: limit compare to each category
     //todo: read only DB entries selected as table fields
     //todo: login to DB
     /* nice to haves
     //add info/help
     //work on design for portrait/landscape, update background img
-    //get rid of public variables
-    //more elegant handling of saving instances
-    //close keyboard when done
     //do not show same letter after restart
     //adjust difficulty according to database entries in strings.xml
     //add highscore
@@ -59,10 +54,11 @@ public class MainActivity extends AppCompatActivity {
     private static FirebaseDatabase database;
     private Boolean gameHasStarted = false;
     private Boolean scoreBarIsVisible = false;
-    private long chronoTime = 0;
+    private long chronoTime = elapsedRealtime();
+    private CharSequence chronoText = "00:00";
     private CharSequence scoreText;
     private int difficultySelected;
-    private String selectedLetter;
+    private String selectedLetter = "";
     private String geoNamesString;
     private Boolean correctCityEntry = false;
     private Boolean correctCountryEntry = false;
@@ -78,17 +74,21 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //initializing Firebase DB and making it available for offline use
+        if(database == null) {
+            database = FirebaseDatabase.getInstance();
+            database.setPersistenceEnabled(true);
+        }
         //Set Toolbar (see menu file) - https://guides.codepath.com/android/Using-the-App-Toolbar
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
         //hide stop button
         Button stopButton = (Button) findViewById(R.id.stop_button);
         stopButton.setVisibility(View.GONE);
-        //initializing Firebase DB and making it available for offline use
-        if(database == null) {
-            database = FirebaseDatabase.getInstance();
-            database.setPersistenceEnabled(true);
-        }
+        /*/Set Chronometer to 00:00
+        chronometer = (Chronometer) findViewById(R.id.chronometer);
+        chronometer.setBase(chronoTime);
+        chronometer.stop();*/
         //Setup table to play with selected settings from fields activity - if user made a choice
         setupTableToPlay();
         //Fetch keyListener from EditText fields in table
@@ -103,11 +103,6 @@ public class MainActivity extends AppCompatActivity {
         //hide bar that shows score
         TextView scoreBar = (TextView) findViewById(R.id.your_score_is);
         scoreBar.setVisibility(View.GONE);
-        //set correct fields entry count to false
-        correctCityEntry = false;
-        correctCountryEntry = false;
-        correctRiverEntry = false;
-        correctMountainEntry = false;
         // Restore preferences
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
         difficultySelected = settings.getInt("difficultySelected", 1);  //1 is default
@@ -148,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(savedInstanceState);
         chronometer = (Chronometer) findViewById(R.id.chronometer);
         savedInstanceState.putLong("Chronometer", chronometer.getBase());
+        savedInstanceState.putCharSequence("ChronoText", chronometer.getText());
         savedInstanceState.putString("SelectedLetter", selectedLetter);
         savedInstanceState.putString("GeoNamesString", geoNamesString);
         Button stopButton = (Button) findViewById(R.id.stop_button);
@@ -166,19 +162,9 @@ public class MainActivity extends AppCompatActivity {
     //restore saved instance from savedInstanceState
     public void onRestoreInstanceState(Bundle savedInstanceState){
         super.onRestoreInstanceState(savedInstanceState);
-        //set correct fields entry count to false, remove green background from fields
-        correctCityEntry = false;   //todo do I need these????
-        correctCountryEntry = false;
-        correctRiverEntry = false;
-        correctMountainEntry = false;
         //restore selected letter to variable
         if((savedInstanceState !=null) && savedInstanceState.containsKey("SelectedLetter")) {
             selectedLetter = savedInstanceState.getString("SelectedLetter");
-        }
-        //restore time for chronometer
-        //chronometer is stopped and shows stop time todo: find bug
-        if(savedInstanceState.containsKey("Chronometer")) {
-            chronoTime = savedInstanceState.getLong("Chronometer");
         }
         //restore Start/Stop Button visibility, i.e. game status, view is recreated in onResume()
         if((savedInstanceState !=null) && savedInstanceState.containsKey("StopButton")) {
@@ -186,6 +172,10 @@ public class MainActivity extends AppCompatActivity {
             //restore status: game is started, stop Button is visible
             if (stopButtonVisibility == 0) {
                 gameHasStarted = true;
+                //restore time-base for chronometer
+                if(savedInstanceState.containsKey("Chronometer")) {
+                    chronoTime = savedInstanceState.getLong("Chronometer");
+                }
                 //restore geo names variable
                 if(savedInstanceState.containsKey("GeoNamesString")) {
                     geoNamesString = savedInstanceState.getString("GeoNamesString");
@@ -193,6 +183,10 @@ public class MainActivity extends AppCompatActivity {
             //restore status: game is stopped
             } else {
                 gameHasStarted = false;
+                //restore Text Value for Chronometer
+                if(savedInstanceState.containsKey("ChronoText")) {
+                    chronoText = savedInstanceState.getCharSequence("ChronoText");
+                }
                 //restore score text
                 if(savedInstanceState.containsKey("ScoreBar")) {
                     int scoreBarVisibility = savedInstanceState.getInt("ScoreBar");
@@ -223,7 +217,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
     //Restore saved views after activity is recreated
     @Override
     public void onResume(){
@@ -237,12 +230,14 @@ public class MainActivity extends AppCompatActivity {
         Button startButton = (Button) findViewById(R.id.start_button);
         //if game status = started, stop button is visible, and chronometer resumes counting
         if (gameHasStarted) {
+            //chronometer continues counting
             chronometer.setBase(chronoTime);
             chronometer.start();
             stopButton.setVisibility(View.VISIBLE);
             startButton.setVisibility(View.GONE);
         } else {                                    //i.e. game is stopped
-            chronometer.setBase(chronoTime);
+            //set chronometer text value
+            chronometer.setText(chronoText);
             chronometer.stop();
             stopButton.setVisibility(View.GONE);
             startButton.setVisibility(View.VISIBLE);
