@@ -42,7 +42,6 @@ public class MainActivity extends AppCompatActivity {
     //todo: limit compare to each category
     //todo: read only DB entries selected as table fields
     //todo: login to DB
-    //todo: remove Logs
     /* nice to haves
     //add info/help
     //work on design for portrait/landscape, update background img
@@ -58,6 +57,10 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String PREFS_NAME = "MyPrefsFile";
     private static FirebaseDatabase database;
+    private Boolean gameHasStarted = false;
+    private Boolean scoreBarIsVisible = false;
+    private long chronoTime = 0;
+    private CharSequence scoreText;
     private int difficultySelected;
     private String selectedLetter;
     private String geoNamesString;
@@ -86,8 +89,6 @@ public class MainActivity extends AppCompatActivity {
             database = FirebaseDatabase.getInstance();
             database.setPersistenceEnabled(true);
         }
-        //FirebaseDatabase database = FirebaseDatabase.getInstance();
-
         //Setup table to play with selected settings from fields activity - if user made a choice
         setupTableToPlay();
         //Fetch keyListener from EditText fields in table
@@ -151,6 +152,7 @@ public class MainActivity extends AppCompatActivity {
         savedInstanceState.putString("GeoNamesString", geoNamesString);
         Button stopButton = (Button) findViewById(R.id.stop_button);
         savedInstanceState.putInt("StopButton", stopButton.getVisibility());
+        //save score bar
         TextView scoreText = (TextView) findViewById(R.id.your_score_is);
         savedInstanceState.putInt("ScoreBar", scoreText.getVisibility());
         savedInstanceState.putCharSequence("ScoreText", scoreText.getText());
@@ -165,87 +167,110 @@ public class MainActivity extends AppCompatActivity {
     public void onRestoreInstanceState(Bundle savedInstanceState){
         super.onRestoreInstanceState(savedInstanceState);
         //set correct fields entry count to false, remove green background from fields
-        correctCityEntry = false;
+        correctCityEntry = false;   //todo do I need these????
         correctCountryEntry = false;
         correctRiverEntry = false;
         correctMountainEntry = false;
-        //restore Start/Stop Button visibility and view according to game status
+        //restore selected letter to variable
+        if((savedInstanceState !=null) && savedInstanceState.containsKey("SelectedLetter")) {
+            selectedLetter = savedInstanceState.getString("SelectedLetter");
+        }
+        //restore time for chronometer
+        //chronometer is stopped and shows stop time todo: find bug
+        if(savedInstanceState.containsKey("Chronometer")) {
+            chronoTime = savedInstanceState.getLong("Chronometer");
+        }
+        //restore Start/Stop Button visibility, i.e. game status, view is recreated in onResume()
         if((savedInstanceState !=null) && savedInstanceState.containsKey("StopButton")) {
-            Button stopButton = (Button) findViewById(R.id.stop_button);
-            Button startButton = (Button) findViewById(R.id.start_button);
-            chronometer = (Chronometer) findViewById(R.id.chronometer);
-            TextView scoreBar = (TextView) findViewById(R.id.your_score_is);
-            TextView selectedLetterText = (TextView) findViewById(R.id.letter_to_play);
             int stopButtonVisibility = savedInstanceState.getInt("StopButton");
-
-            //restore selected letter and display
-            if(savedInstanceState.containsKey("SelectedLetter")) {
-                selectedLetter = savedInstanceState.getString("SelectedLetter");
-                selectedLetterText.setText(getString(R.string.letter_to_play) + " " + selectedLetter);
-            }
-
-            //Log.i("Stop ", valueOf(stopButtonVisibility)); //todo remove
-            //restore status: game is started
+            //restore status: game is started, stop Button is visible
             if (stopButtonVisibility == 0) {
-                stopButton.setVisibility(View.VISIBLE);
-                startButton.setVisibility(View.GONE);
-                //chronometer continues counting
-                if(savedInstanceState.containsKey("Chronometer")) {
-                    long chronoTime;
-                    chronoTime = savedInstanceState.getLong("Chronometer");
-                    chronometer.setBase(chronoTime);
-                    chronometer.start();
-                }
+                gameHasStarted = true;
                 //restore geo names variable
                 if(savedInstanceState.containsKey("GeoNamesString")) {
                     geoNamesString = savedInstanceState.getString("GeoNamesString");
                 }
-            //status: game is stopped
+            //restore status: game is stopped
             } else {
-                stopButton.setVisibility(View.GONE);
-                startButton.setVisibility(View.VISIBLE);
-                //chronometer is stopped and shows stop time
-                if(savedInstanceState.containsKey("Chronometer")) {
-                    long chronoTime;
-                    chronoTime = savedInstanceState.getLong("Chronometer");
-                    chronometer.setBase(chronoTime);
-                    chronometer.stop();
-                    //chronometer.setBase(chronoTime-elapsedRealtime()/60);
-                }
+                gameHasStarted = false;
                 //restore score text
                 if(savedInstanceState.containsKey("ScoreBar")) {
                     int scoreBarVisibility = savedInstanceState.getInt("ScoreBar");
                     if (scoreBarVisibility == 0) {
-                        scoreBar.setVisibility(View.VISIBLE);
-                        scoreBar.setText(savedInstanceState.getCharSequence("ScoreText"));
+                        scoreBarIsVisible = true;
+                        scoreText = savedInstanceState.getCharSequence("ScoreText");
                     } else {
-                        scoreBar.setVisibility(View.GONE);
+                        scoreBarIsVisible = false;
+                        scoreText = "";
                     }
                 }
-                //restore background color for edit text fields
+                //check if background color for correct edit text fields needs to be reset (only when game is stopped)
                 if (savedInstanceState.containsKey("CityFieldColor") && savedInstanceState.getBoolean("CityFieldColor")) {
-                    EditText editTextCity = (EditText) findViewById(R.id.edit_text_city);
-                    editTextCity.setBackgroundColor(getColor(R.color.green));
                     correctCityEntry = true;
                 }
                 if (savedInstanceState.containsKey("CountryFieldColor") && savedInstanceState.getBoolean("CountryFieldColor")) {
-                    EditText editTextCountry = (EditText) findViewById(R.id.edit_text_country);
-                    editTextCountry.setBackgroundColor(getColor(R.color.green));
                     correctCountryEntry = true;
                 }
                 if (savedInstanceState.containsKey("RiverFieldColor") && savedInstanceState.getBoolean("RiverFieldColor")) {
-                    EditText editTextRiver = (EditText) findViewById(R.id.edit_text_river);
-                    editTextRiver.setBackgroundColor(getColor(R.color.green));
                     correctRiverEntry = true;
                 }
                 if (savedInstanceState.containsKey("MountainFieldColor") && savedInstanceState.getBoolean("MountainFieldColor")) {
-                    EditText editTextMountain = (EditText) findViewById(R.id.edit_text_mountain);
-                    editTextMountain.setBackgroundColor(getColor(R.color.green));
                     correctMountainEntry = true;
                 }
             }
         } else {
             onCreate(savedInstanceState);
+        }
+    }
+
+
+    //Restore saved views after activity is recreated
+    @Override
+    public void onResume(){
+        super.onResume();
+        //Display selected Letter
+        TextView selectedLetterText = (TextView) findViewById(R.id.letter_to_play);
+        selectedLetterText.setText(getString(R.string.letter_to_play) + " " + selectedLetter);
+        //get views that need to be reset according to game status
+        chronometer = (Chronometer) findViewById(R.id.chronometer);
+        Button stopButton = (Button) findViewById(R.id.stop_button);
+        Button startButton = (Button) findViewById(R.id.start_button);
+        //if game status = started, stop button is visible, and chronometer resumes counting
+        if (gameHasStarted) {
+            chronometer.setBase(chronoTime);
+            chronometer.start();
+            stopButton.setVisibility(View.VISIBLE);
+            startButton.setVisibility(View.GONE);
+        } else {                                    //i.e. game is stopped
+            chronometer.setBase(chronoTime);
+            chronometer.stop();
+            stopButton.setVisibility(View.GONE);
+            startButton.setVisibility(View.VISIBLE);
+            //restore score bar
+            TextView scoreBar = (TextView) findViewById(R.id.your_score_is);
+            if (scoreBarIsVisible) {
+                scoreBar.setVisibility(View.VISIBLE);
+                scoreBar.setText(scoreText);
+            } else {
+                scoreBar.setVisibility(View.GONE);
+            }
+            //restore background color for edit text fields (only when game is stopped)
+            if (correctCityEntry) {
+                EditText editTextCity = (EditText) findViewById(R.id.edit_text_city);
+                editTextCity.setBackgroundColor(getColor(R.color.green));
+            }
+            if (correctCountryEntry) {
+                EditText editTextCountry = (EditText) findViewById(R.id.edit_text_country);
+                editTextCountry.setBackgroundColor(getColor(R.color.green));
+            }
+            if (correctRiverEntry) {
+                EditText editTextRiver = (EditText) findViewById(R.id.edit_text_river);
+                editTextRiver.setBackgroundColor(getColor(R.color.green));
+            }
+            if (correctMountainEntry) {
+                EditText editTextMountain = (EditText) findViewById(R.id.edit_text_mountain);
+                editTextMountain.setBackgroundColor(getColor(R.color.green));
+            }
         }
     }
 
