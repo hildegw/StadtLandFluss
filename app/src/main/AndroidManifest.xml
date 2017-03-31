@@ -20,7 +20,9 @@
         <activity
             android:name=".TableActivity"
             android:parentActivityName=".MainActivity"></activity>
-        <activity android:name=".DifficultyActivity"></activity>
+        <activity
+            android:name=".DifficultyActivity"
+            android:parentActivityName=".MainActivity"></activity>
     </application>
 
 </manifest>

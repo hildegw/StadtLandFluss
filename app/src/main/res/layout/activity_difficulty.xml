@@ -49,13 +49,11 @@
                 <RadioButton
                     android:id="@+id/radiobutton_middle"
                     style="@style/checkBox"
-                    android:checked="false"
                     android:text="@string/select_difficulty_middle" />
 
                 <RadioButton
                     android:id="@+id/radiobutton_hard"
                     style="@style/checkBox"
-                    android:checked="false"
                     android:text="@string/select_difficulty_hard" />
             </RadioGroup>
         </LinearLayout>

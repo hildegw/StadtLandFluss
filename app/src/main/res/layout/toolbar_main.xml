@@ -6,14 +6,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
     <android.support.v7.widget.Toolbar
         android:id="@+id/my_toolbar"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/colorPrimaryDark"
         android:elevation="4dp"
         app:titleTextColor="@android:color/white" />
-
-
 </LinearLayout>

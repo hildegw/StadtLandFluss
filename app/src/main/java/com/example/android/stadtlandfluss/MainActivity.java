@@ -2,6 +2,7 @@ package com.example.android.stadtlandfluss;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -30,34 +31,20 @@ import java.util.Map;
 import java.util.Random;
 
 import static android.os.SystemClock.elapsedRealtime;
-import static com.example.android.stadtlandfluss.R.id.difficulty;
 import static java.lang.String.valueOf;
 
 public class MainActivity extends AppCompatActivity {
 
-    public String selectedLetter;
-    public String geoNamesString;
-    private Boolean correctCityEntry = false;
-    private Boolean correctCountryEntry = false;
-    private Boolean correctRiverEntry = false;
-    private Boolean correctMountainEntry = false;
-    private Chronometer chronometer;
-    private KeyListener editTextCityKeyListener;
-    private KeyListener editTextCountryKeyListener;
-    private KeyListener editTextRiverKeyListener;
-    private KeyListener editTextMountainKeyListener;
-
     //todo: get feedback
     //todo: duplicate entries in DB where common names are reduced, e.g. mount everest
-    //todo: disable Fields Selection Menu and upload to Playstore
+    //todo: upload to Playstore, add copyright/impressum
     //todo: test on different devices
-    //todo: keep status when switching activities (remove Table Activity)
     //todo: limit compare to each category
     //todo: read only DB entries selected as table fields
     //todo: login to DB
-    //todo: add info/help
     //todo: remove Logs
     /* nice to haves
+    //add info/help
     //work on design for portrait/landscape, update background img
     //get rid of public variables
     //more elegant handling of saving instances
@@ -68,6 +55,20 @@ public class MainActivity extends AppCompatActivity {
     //educational - link to Wiki, Scattergories
     //arrange table in blocks above each other / center fields!?
     */
+
+    public static final String PREFS_NAME = "MyPrefsFile";
+    private int difficultySelected;
+    private String selectedLetter;
+    private String geoNamesString;
+    private Boolean correctCityEntry = false;
+    private Boolean correctCountryEntry = false;
+    private Boolean correctRiverEntry = false;
+    private Boolean correctMountainEntry = false;
+    private Chronometer chronometer;
+    private KeyListener editTextCityKeyListener;
+    private KeyListener editTextCountryKeyListener;
+    private KeyListener editTextRiverKeyListener;
+    private KeyListener editTextMountainKeyListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,6 +99,10 @@ public class MainActivity extends AppCompatActivity {
         correctCountryEntry = false;
         correctRiverEntry = false;
         correctMountainEntry = false;
+        // Restore preferences
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+        difficultySelected = settings.getInt("difficultySelected", 1);  //1 is default
+        //Log.i("diff-from-pref", valueOf(difficultySelected));
     }
 
     // Menu icons in toolbar are inflated just as with actionbar
@@ -117,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent intentTable = new Intent(MainActivity.this, TableActivity.class);
                 startActivity(intentTable);
                 return true;
-            case difficulty:
+            case R.id.difficulty:
                 //Start third activity: difficulty
                 Intent intentDifficulty = new Intent(MainActivity.this, DifficultyActivity.class);
                 startActivity(intentDifficulty);
@@ -127,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //save current stat in instance bundle
+    //save current state in instance bundle
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState)
     {
@@ -164,7 +169,14 @@ public class MainActivity extends AppCompatActivity {
             TextView scoreBar = (TextView) findViewById(R.id.your_score_is);
             TextView selectedLetterText = (TextView) findViewById(R.id.letter_to_play);
             int stopButtonVisibility = savedInstanceState.getInt("StopButton");
-            Log.i("Stop ", valueOf(stopButtonVisibility)); //todo remove
+
+            //restore selected letter and display
+            if(savedInstanceState.containsKey("SelectedLetter")) {
+                selectedLetter = savedInstanceState.getString("SelectedLetter");
+                selectedLetterText.setText(getString(R.string.letter_to_play) + " " + selectedLetter);
+            }
+
+            //Log.i("Stop ", valueOf(stopButtonVisibility)); //todo remove
             //restore status: game is started
             if (stopButtonVisibility == 0) {
                 stopButton.setVisibility(View.VISIBLE);
@@ -175,11 +187,6 @@ public class MainActivity extends AppCompatActivity {
                     chronoTime = savedInstanceState.getLong("Chronometer");
                     chronometer.setBase(chronoTime);
                     chronometer.start();
-                }
-                //restore selected letter and display
-                if(savedInstanceState.containsKey("SelectedLetter")) {
-                    selectedLetter = savedInstanceState.getString("SelectedLetter");
-                    selectedLetterText.setText(getString(R.string.letter_to_play) + " " + selectedLetter);
                 }
                 //restore geo names variable
                 if(savedInstanceState.containsKey("GeoNamesString")) {
@@ -441,28 +448,18 @@ public class MainActivity extends AppCompatActivity {
         return correctFieldsCount;
     }
 
-    //Get difficulty from Bundle handed over from Difficulty Activity
-    private int difficultyFromBundle() {
-        Bundle letterBundle  = getIntent().getExtras();
-        int difficulty = 1;
-        if(letterBundle != null) {
-            difficulty = letterBundle.containsKey("Difficulty") ? letterBundle.getInt("Difficulty") : 1;
-        }
-        return difficulty;
-    }
-
     //make random Letter selection, display, and store letter in variable
     private void showSelectLetter() {
         selectedLetter = "A";                        //set default
-        int difficulty = difficultyFromBundle();     //get difficulty info from activity
+        //int difficulty = difficultyFromBundle();     //get difficulty info from activity
         //random select letter
         Random randomLetter = new Random();
         String easyLetters = getString(R.string.easy_letters);
         String middleLetters = getString(R.string.middle_letters);
         String hardLetters = getString(R.string.hard_letters);
-        if (difficulty == 1) {
+        if (difficultySelected == 1) {
             selectedLetter = valueOf(easyLetters.charAt(randomLetter.nextInt(easyLetters.length())));
-        } else if (difficulty == 2) {
+        } else if (difficultySelected == 2) {
             selectedLetter = valueOf(middleLetters.charAt(randomLetter.nextInt(middleLetters.length())));
         } else {
             selectedLetter = valueOf(hardLetters.charAt(randomLetter.nextInt(hardLetters.length())));
@@ -474,18 +471,12 @@ public class MainActivity extends AppCompatActivity {
 
     //Provide fields to play in table based on boxes checked
     private void setupTableToPlay() {
-        //get selections from fields activity (true/false via Extras(Bundle))
-        boolean citySelected = true;
-        boolean countrySelected = true;
-        boolean riverSelected = true;
-        boolean mountainSelected = true;
-        Bundle fields  = getIntent().getExtras();
-        if(fields != null) {
-            citySelected = fields.containsKey("City") ? fields.getBoolean("City") : true;
-            countrySelected = fields.containsKey("Country") ? fields.getBoolean("Country") : true;
-            riverSelected = fields.containsKey("River") ? fields.getBoolean("River") : true;
-            mountainSelected = fields.containsKey("Mountain") ? fields.getBoolean("Mountain") : true;
-        }
+        // Restore preferences
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+        boolean citySelected = settings.getBoolean("citySelected", true);
+        boolean countrySelected = settings.getBoolean("countrySelected", true);
+        boolean riverSelected = settings.getBoolean("riverSelected", true);
+        boolean mountainSelected = settings.getBoolean("mountainSelected", true);
         //Each field to play (column) is made visible/gone depending on checkbox, here: "city"
         TextView cityTableHead = (TextView) findViewById(R.id.table_head_city);
         TextView cityTableField = (TextView) findViewById(R.id.edit_text_city);
@@ -548,24 +539,23 @@ public class MainActivity extends AppCompatActivity {
 
     //calculate score from correct fields * difficulty * score from Time
     private void calculateScore() {
-        int difficulty = difficultyFromBundle();                    //get difficulty info from activity
         int correctFieldsCount = compareTableFieldsWithGeoNames();  //get correct fields count
         int scoreFromTime = timeScore();                            //get score from time
-        int score = scoreFromTime * difficulty * correctFieldsCount;  //calculate score
+        int score = scoreFromTime * difficultySelected * correctFieldsCount;  //calculate score
         //display score
         String showScore = valueOf(score);
         TextView scoreText = (TextView) findViewById(R.id.your_score_is);
         if(score <= 30) {
             scoreText.setText(getString(R.string.your_score_is) + " " + showScore + " points.\n"
-                    + "difficulty: " + difficulty + "\n" + "time score: " + scoreFromTime + "\n" + "coorect answers: " + correctFieldsCount + "\n"
+                    + "difficulty: " + difficultySelected + "\n" + "time score: " + scoreFromTime + "\n" + "correct answers: " + correctFieldsCount + "\n"
                     +  "Try again!");
                 } else if(30 < score && score <= 80) {
                     scoreText.setText(getString(R.string.your_score_is) + " " + showScore + " points.\n"
-                    + "difficulty: " + difficulty + "\n" + "time score: " + scoreFromTime + "\n" + "coorect answers: " + correctFieldsCount + "\n"
+                    + "difficulty: " + difficultySelected + "\n" + "time score: " + scoreFromTime + "\n" + "correct answers: " + correctFieldsCount + "\n"
                     + " Not bad!");
                 } else if (score > 80) {
                     scoreText.setText(getString(R.string.your_score_is) + " " + showScore + " points.\n"
-                    + "difficulty: " + difficulty + "\n" + "time score: " + scoreFromTime + "\n" + "correct answers: " + correctFieldsCount + "\n"
+                    + "difficulty: " + difficultySelected + "\n" + "time score: " + scoreFromTime + "\n" + "correct answers: " + correctFieldsCount + "\n"
                     + "You are a true expert!");
                 } else
                     scoreText.setText("Try again!");
