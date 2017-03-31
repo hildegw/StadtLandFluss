@@ -1,4 +1,4 @@
-package com.example.android.stadtlandfluss;
+package com.hildegw.android.stadtlandfluss;
 
 import org.junit.Test;
 

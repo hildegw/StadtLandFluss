@@ -1,4 +1,4 @@
-package com.example.android.stadtlandfluss;
+package com.hildegw.android.stadtlandfluss;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

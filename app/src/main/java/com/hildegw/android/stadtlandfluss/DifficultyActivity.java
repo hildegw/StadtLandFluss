@@ -1,4 +1,4 @@
-package com.example.android.stadtlandfluss;
+package com.hildegw.android.stadtlandfluss;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -6,13 +6,14 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
-import static com.example.android.stadtlandfluss.MainActivity.PREFS_NAME;
-import static java.lang.String.valueOf;
+import com.hildegw.android.stadtlandfluss.MainActivity;
+import com.hildegw.android.stadtlandfluss.R;
+
+import static com.hildegw.android.stadtlandfluss.MainActivity.PREFS_NAME;
 
 public class DifficultyActivity extends AppCompatActivity {
 
@@ -32,7 +33,7 @@ public class DifficultyActivity extends AppCompatActivity {
         // Restore preferences
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
         difficultySelected = settings.getInt("difficultySelected", 1);  //1 is default
-        Log.i("diff-act", valueOf(difficultySelected));
+        //Log.i("diff-act", valueOf(difficultySelected));
         RadioButton easyRadio = (RadioButton) findViewById(R.id.radiobutton_easy);
         RadioButton middleRadio = (RadioButton) findViewById(R.id.radiobutton_middle);
         RadioButton hardRadio = (RadioButton) findViewById(R.id.radiobutton_hard);

@@ -1,4 +1,4 @@
-package com.example.android.stadtlandfluss;
+package com.hildegw.android.stadtlandfluss;
 
 import android.content.Context;
 import android.content.Intent;
@@ -17,6 +17,8 @@ import android.widget.Chronometer;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.hildegw.android.stadtlandfluss.DifficultyActivity;
+import com.hildegw.android.stadtlandfluss.TableActivity;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -368,7 +370,7 @@ public class MainActivity extends AppCompatActivity {
                 Normalizer
                         .normalize(geoNamesString, Normalizer.Form.NFD)
                         .replaceAll("[^\\p{ASCII}]", "");
-        Log.i("geo norm", geoNamesStringNormalize);
+        //Log.i("geo norm", geoNamesStringNormalize);
         //Remove generic words, e.g. river from Geonames String and user entry
         String[] wordsToRemove = new String[] {"river", "rivier", "mount", "mont", "piz", "col", "cima", "cerro", "mt.", "mt", "monte", "gunung", "rio", "creek"};
         String geoNamesReduced = geoNamesStringNormalize;
@@ -529,11 +531,11 @@ public class MainActivity extends AppCompatActivity {
         //get Time elapsed and convert into score (each minute used reduces score of 10)
         long timePlayed = elapsedRealtime() - chronometer.getBase();
         int timeElapsed = (int)(timePlayed/1000);
-        Log.i("timeElapsed", valueOf(timeElapsed));
+        //Log.i("timeElapsed", valueOf(timeElapsed));
         if(timeElapsed < 300) {
             scoreFromTime = (300 - timeElapsed) / 30 +1;
         }
-        Log.i("score from time", valueOf(scoreFromTime));
+        //Log.i("score from time", valueOf(scoreFromTime));
         return scoreFromTime;
     }
 
@@ -560,6 +562,6 @@ public class MainActivity extends AppCompatActivity {
                 } else
                     scoreText.setText("Try again!");
 
-        Log.i("correct fields: ", valueOf(correctFieldsCount)); //todo remove
+        //Log.i("correct fields: ", valueOf(correctFieldsCount)); //todo remove
     }
 }

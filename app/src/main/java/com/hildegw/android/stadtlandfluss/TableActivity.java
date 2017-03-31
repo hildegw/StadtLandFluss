@@ -1,4 +1,4 @@
-package com.example.android.stadtlandfluss;
+package com.hildegw.android.stadtlandfluss;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,7 +9,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.CheckBox;
 
-import static com.example.android.stadtlandfluss.MainActivity.PREFS_NAME;
+import static com.hildegw.android.stadtlandfluss.MainActivity.PREFS_NAME;
+import static com.hildegw.android.stadtlandfluss.MainActivity.PREFS_NAME;
 
 
 public class TableActivity extends AppCompatActivity {
@@ -60,7 +61,7 @@ public class TableActivity extends AppCompatActivity {
         editor.putBoolean("mountainSelected", mountainSelected);
         editor.commit();
         //go back to main activity
-        Intent intent = new Intent(TableActivity.this, MainActivity.class);
+        Intent intent = new Intent(TableActivity.this, com.hildegw.android.stadtlandfluss.MainActivity.class);
         startActivity(intent);
         return true;
     }

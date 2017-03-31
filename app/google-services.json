@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:673661410724:android:5fc578234f56b746",
         "android_client_info": {
-          "package_name": "com.example.android.stadtlandfluss"
+          "package_name": "com.hildegw.android.stadtlandfluss"
         }
       },
       "oauth_client": [
@@ -18,7 +18,7 @@
           "client_id": "673661410724-rnsvruhf8asdat9f9v4bfpe849t26c4u.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.android.stadtlandfluss",
+            "package_name": "com.hildegw.android.stadtlandfluss",
             "certificate_hash": "d18b7e2b5ea682372ba31be8af22457178cc6d84"
           }
         },

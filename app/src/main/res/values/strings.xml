@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">City Country River</string>
+    <string name="app_name">City Country &amp; River</string>
     <string name="select_fields">Please select categories to play</string>
     <string name="checkbox_city">City</string>
     <string name="checkbox_country">Country</string>
