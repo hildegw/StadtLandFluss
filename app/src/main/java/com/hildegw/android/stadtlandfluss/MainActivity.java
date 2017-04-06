@@ -35,8 +35,9 @@ import static java.lang.String.valueOf;
 
 public class MainActivity extends AppCompatActivity {
 
-    //todo: duplicate entries in DB where common names are reduced, e.g. mount everest
-    //todo: upload to Playstore, add copyright/impressum
+    //todo: compile to lower Android versions
+    // todo: duplicate entries in DB where common names are reduced, e.g. mount everest
+    //todo: add copyright/impressum
     //todo: limit compare to each category
     //todo: read only DB entries selected as table fields
     //todo: login to DB
@@ -85,10 +86,6 @@ public class MainActivity extends AppCompatActivity {
         //hide stop button
         Button stopButton = (Button) findViewById(R.id.stop_button);
         stopButton.setVisibility(View.GONE);
-        /*/Set Chronometer to 00:00
-        chronometer = (Chronometer) findViewById(R.id.chronometer);
-        chronometer.setBase(chronoTime);
-        chronometer.stop();*/
         //Setup table to play with selected settings from fields activity - if user made a choice
         setupTableToPlay();
         //Fetch keyListener from EditText fields in table
@@ -106,7 +103,6 @@ public class MainActivity extends AppCompatActivity {
         // Restore preferences
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
         difficultySelected = settings.getInt("difficultySelected", 1);  //1 is default
-        //Log.i("diff-from-pref", valueOf(difficultySelected));
     }
 
     // Menu icons in toolbar are inflated just as with actionbar
@@ -395,7 +391,6 @@ public class MainActivity extends AppCompatActivity {
                 Normalizer
                         .normalize(geoNamesString, Normalizer.Form.NFD)
                         .replaceAll("[^\\p{ASCII}]", "");
-        //Log.i("geo norm", geoNamesStringNormalize);
         //Remove generic words, e.g. river from Geonames String and user entry
         String[] wordsToRemove = new String[] {"river", "rivier", "mount", "mont", "piz", "col", "cima", "cerro", "mt.", "mt", "monte", "gunung", "rio", "creek"};
         String geoNamesReduced = geoNamesStringNormalize;
@@ -410,11 +405,6 @@ public class MainActivity extends AppCompatActivity {
             riverNormalizedReduced = riverNormalizedReduced.replace(wordsToRemove[i], "").trim();
             mountainNormalizedReduced = mountainNormalizedReduced.replace(wordsToRemove[i], "").trim();
         }
-        /*Log.i("geoNamesReduce", geoNamesReduced);
-        Log.i("city normal", cityNormalizedReduced);
-        Log.i("country normal", countryNormalizedReduced);
-        Log.i("river normal", riverNormalizedReduced);
-        Log.i("mountain normal", mountainNormalizedReduced);*/
         //split string with Geonames from DB into Array of names
         String[] splitGeoNames = geoNamesReduced.split(",");
         //check, if user table entries are found in geo names string
@@ -424,38 +414,30 @@ public class MainActivity extends AppCompatActivity {
             //check if user entry for city exists and if it starts with the correct letter
             if (!correctCityEntry && !cityNormalizedReduced.matches("") && geoNamesReduced.contains(cityNormalizedReduced)) {
                 //compare if user entry matches one of the Geo Names in DB
-                //Log.i("geo comapre with city", compareEachGeoName);
                 if (cityNormalizedReduced.equals(compareEachGeoName)) {
                     correctFieldsCount++;
                     correctCityEntry = true;
-                    //Log.i("correctCityEntry", valueOf(correctCityEntry));
                 }
             }
             //check user entry for country 
             if (!correctCountryEntry && !countryNormalizedReduced.matches("") && geoNamesReduced.contains(countryNormalizedReduced)) {
-                //Log.i("geo compare w country", compareEachGeoName);
                 if (countryNormalizedReduced.equals(compareEachGeoName)) {
                     correctFieldsCount++;
                     correctCountryEntry = true;
-                    //Log.i("correctCountryEntry", valueOf(correctCountryEntry));
                 }
             }
             //check user entry for river
             if (!correctRiverEntry && !riverNormalizedReduced.matches("") && geoNamesReduced.contains(riverNormalizedReduced)) {
-                //Log.i("geo compare w river", compareEachGeoName);
                 if (riverNormalizedReduced.equals(compareEachGeoName)) {
                     correctFieldsCount++;
                     correctRiverEntry = true;
-                    //Log.i("correctRiverEntry", valueOf(correctRiverEntry));
                 }
             }
             //check user entry for mountain
             if (!correctMountainEntry && !mountainNormalizedReduced.matches("") && geoNamesReduced.contains(mountainNormalizedReduced)) {
-                //Log.i("geo compare w mountain", compareEachGeoName);
                 if (mountainNormalizedReduced.equals(compareEachGeoName)) {
                     correctFieldsCount++;
                     correctMountainEntry = true;
-                    //Log.i("correctMountainEntry", valueOf(correctMountainEntry));
                 }
             }
         }
@@ -556,11 +538,9 @@ public class MainActivity extends AppCompatActivity {
         //get Time elapsed and convert into score (each minute used reduces score of 10)
         long timePlayed = elapsedRealtime() - chronometer.getBase();
         int timeElapsed = (int)(timePlayed/1000);
-        //Log.i("timeElapsed", valueOf(timeElapsed));
         if(timeElapsed < 300) {
-            scoreFromTime = (300 - timeElapsed) / 30 +1;
+            scoreFromTime = (300 - timeElapsed) / 30 + 1;
         }
-        //Log.i("score from time", valueOf(scoreFromTime));
         return scoreFromTime;
     }
 
@@ -573,20 +553,24 @@ public class MainActivity extends AppCompatActivity {
         String showScore = valueOf(score);
         TextView scoreText = (TextView) findViewById(R.id.your_score_is);
         if(score <= 30) {
-            scoreText.setText(getString(R.string.your_score_is) + " " + showScore + " points.\n"
-                    + "difficulty: " + difficultySelected + "\n" + "time score: " + scoreFromTime + "\n" + "correct answers: " + correctFieldsCount + "\n"
-                    +  "Try again!");
+            scoreText.setText(getString(R.string.you_scored) + " " + showScore + " " + getString(R.string.points) + "\n"
+                    + getString(R.string.difficulty) + " " + difficultySelected + "\n"
+                    + getString(R.string.time_score) + " " + scoreFromTime + "\n"
+                    + getString(R.string.correct_answers) + " " + correctFieldsCount + "\n"
+                    + getString(R.string.try_again));
                 } else if(30 < score && score <= 80) {
-                    scoreText.setText(getString(R.string.your_score_is) + " " + showScore + " points.\n"
-                    + "difficulty: " + difficultySelected + "\n" + "time score: " + scoreFromTime + "\n" + "correct answers: " + correctFieldsCount + "\n"
-                    + " Not bad!");
+            scoreText.setText(getString(R.string.you_scored) + " " + showScore + " " + getString(R.string.points) + "\n"
+                    + getString(R.string.difficulty) + " " + difficultySelected + "\n"
+                    + getString(R.string.time_score) + " " + scoreFromTime + "\n"
+                    + getString(R.string.correct_answers) + " " + correctFieldsCount + "\n"
+                    + getString(R.string.not_bad));
                 } else if (score > 80) {
-                    scoreText.setText(getString(R.string.your_score_is) + " " + showScore + " points.\n"
-                    + "difficulty: " + difficultySelected + "\n" + "time score: " + scoreFromTime + "\n" + "correct answers: " + correctFieldsCount + "\n"
-                    + "You are a true expert!");
+            scoreText.setText(getString(R.string.you_scored) + " " + showScore + " " + getString(R.string.points) + "\n"
+                    + getString(R.string.difficulty) + " " + difficultySelected + "\n"
+                    + getString(R.string.time_score) + " " + scoreFromTime + "\n"
+                    + getString(R.string.correct_answers) + " " + correctFieldsCount + "\n"
+                    + getString(R.string.true_expert));
                 } else
-                    scoreText.setText("Try again!");
-
-        //Log.i("correct fields: ", valueOf(correctFieldsCount)); //todo remove
+                    scoreText.setText(getString(R.string.try_again));
     }
 }

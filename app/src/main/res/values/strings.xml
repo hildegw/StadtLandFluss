@@ -16,7 +16,14 @@
     <string name="play_header_country">Country</string>
     <string name="play_header_river">River</string>
     <string name="show_score">Stop and Show Score</string>
-    <string name="your_score_is">You scored</string>
+    <string name="you_scored">You scored</string>
+    <string name="difficulty">difficulty:</string>
+    <string name="not_bad">Not bad!</string>
+    <string name="true_expert">You are a true expert!</string>
+    <string name="points">points</string>
+    <string name="time_score">time score:</string>
+    <string name="correct_answers">correct answers:</string>
+    <string name="try_again">Try again!</string>
     <string name="start_game">Plaese press START</string>
     <string name="easy_letters">ACDEFNRST</string>
     <string name="middle_letters">BGHJKLMPU</string>
